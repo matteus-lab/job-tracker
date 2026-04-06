@@ -1,0 +1,19 @@
+{
+  "collectCoverageFrom": ["src/**/*.repository.ts", "src/**/*.service.ts"],
+  "coverageDirectory": "coverage-integration",
+  "coveragePathIgnorePatterns": ["core/hashing/hashing.service.ts"],
+  "coverageProvider": "v8",
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleNameMapper": {
+    "@generated/(.*)$": "<rootDir>/prisma/generated/$1",
+    "^src/(.*)$": "<rootDir>/src/$1",
+    "^test/(.*)$": "<rootDir>/test/$1",
+    "^(\\.{1,2}/.*)\\.js$": "$1"
+  },
+  "rootDir": "../..",
+  "testEnvironment": "node",
+  "testRegex": ".integration-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  }
+}

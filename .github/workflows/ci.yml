@@ -1,0 +1,86 @@
+name: API CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  lint-and-unit:
+    name: Lint & Unit Tests
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma Generate
+        run: npm run api:prisma:generate
+
+      - name: Run Lint
+        run: npm run api:lint
+
+      - name: Run Unit Tests
+        run: npm run api:test:unit
+
+  integration-and-e2e-tests:
+    name: ${{ matrix.tests }} Tests
+    needs: lint-and-unit
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        tests: [integration, e2e]
+
+    env:
+      NODE_ENV: test
+      ALLOWED_ORIGINS: http://localhost:3000
+      DATABASE_URL: postgresql://user:password@localhost:5432/test_db
+      DATABASE_SCHEMA: public
+      JWT_SECRET: cfYtgySVi3KC9hhlR72Bvpax
+
+      POSTGRES_DB: test_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma Generate & Migrate
+        run: |
+          npm run api:prisma:generate
+          npm run api:prisma:migrate:deploy
+
+      - name: Run ${{ matrix.tests }} Tests
+        run: npm run api:test:${{ matrix.tests }}

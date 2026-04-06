@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+  moduleFormat = "cjs"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  extensions = [citext, pgcrypto]
+}
+
+model User {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String        @unique @db.Citext
+  password        String
+  lastname        String?
+  firstname       String?
+
+  // Soft delete lifecycle
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+
+  sessions        Session[]
+  @@map("users")
+}
+
+// hard delete
+model Session {
+  id                      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  hashedRefreshToken      String        @unique
+  userId                  String        @db.Uuid
+  user                    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent               String?
+  ipAddress               String?
+
+  // Hard delete lifecycle
+  createdAt               DateTime      @default(now())
+  expiresAt               DateTime
+
+  @@map("sessions")
+}

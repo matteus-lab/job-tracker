@@ -1,0 +1,109 @@
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import ms from 'ms';
+
+// Core
+import {
+  IHASHING_SERVICE_TOKEN,
+  type IHashingService,
+} from 'src/core/hashing/hashing.service.interface';
+
+// Mappers
+import { SessionMapper } from './session.mapper';
+
+// Schemas
+import { SessionEntity } from './schemas/entities/session.entity';
+import { CreateSessionInput } from './schemas/inputs/createSession.input';
+import {
+  ISESSION_REPOSITORY_TOKEN,
+  type ISessionRepository,
+} from './session.repository.interface';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
+@Injectable()
+export class SessionService {
+  private readonly logger = new Logger(SessionService.name);
+
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(IHASHING_SERVICE_TOKEN)
+    private readonly hashingService: IHashingService,
+    @Inject(ISESSION_REPOSITORY_TOKEN)
+    private readonly repository: ISessionRepository,
+  ) {}
+
+  async create(dto: CreateSessionInput): Promise<{
+    sessionEntity: SessionEntity;
+    rawRefreshToken: string;
+  }> {
+    const rawRefreshToken = crypto.randomUUID();
+    const hashedRefreshToken =
+      await this.hashingService.generateFingerprint(rawRefreshToken);
+
+    const durationStr = this.configService.get<ms.StringValue>(
+      'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+      '1w',
+    );
+    const expiresAt = new Date(Date.now() + ms(durationStr));
+
+    const sessionEntity = await this.repository.create(
+      SessionMapper.toPersistence(dto, { hashedRefreshToken, expiresAt }),
+    );
+
+    return {
+      sessionEntity,
+      rawRefreshToken,
+    };
+  }
+
+  async validateSession(
+    rawRefreshToken: string,
+  ): Promise<SessionEntity | null> {
+    const hashedRefreshToken =
+      await this.hashingService.generateFingerprint(rawRefreshToken);
+
+    const session =
+      await this.repository.findByHashedRefreshToken(hashedRefreshToken);
+
+    if (!session) return null;
+
+    const isExpired = session.expiresAt.getTime() < Date.now();
+    if (isExpired) {
+      await this.repository.deleteManyByHashedRefreshToken(hashedRefreshToken);
+      return null;
+    }
+
+    return session;
+  }
+
+  async deleteByRefreshToken(refreshToken: string): Promise<void> {
+    const hashedRefreshToken =
+      await this.hashingService.generateFingerprint(refreshToken);
+
+    await this.repository.deleteManyByHashedRefreshToken(hashedRefreshToken);
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async expiredSessionsCleanup() {
+    try {
+      const deletedCount = await this.repository.deleteAllExpired();
+
+      this.logger.log(
+        `Cleanup successful. Removed ${deletedCount} expired sessions.`,
+        {
+          task: this.expiredSessionsCleanup.name,
+          count: deletedCount,
+        },
+      );
+    } catch (error) {
+      this.logger.error(
+        'Failed to cleanup expired sessions.',
+        error instanceof Error ? error.stack : undefined,
+        {
+          task: this.expiredSessionsCleanup.name,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      );
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "apps/api/**/*.ts": [
+    "npm run api:lint --",
+    "npm run api:test:unit -- --findRelatedTests --passWithNoTests --bail"
+  ],
+  "**/*.{ts,js,json,md,yml}": ["prettier --write"]
+}

@@ -11,13 +11,11 @@ import {
 } from 'src/core/exceptions/business.exceptions';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
-import {
-  USER_REPOSITORY_PORT_TOKEN,
-  UserDraft,
-} from 'src/modules/user/domain/user.repository.port';
+import { USER_REPOSITORY_PORT_TOKEN } from 'src/modules/user/domain/user.repository.port';
 import { CreateUserCommand } from 'src/modules/user/engine/commands/createUser.command';
 import { UserService } from 'src/modules/user/engine/user.service';
 import { UserRepository } from 'src/modules/user/infra/user.repository';
+import { CreateUserPersistence } from 'src/modules/user/domain/persistence/createUser.persistence';
 
 let INSERTED_USER: UserModel;
 
@@ -140,15 +138,15 @@ describe('User module integration', () => {
 
   describe('UserRepository', () => {
     describe('create', () => {
-      const userDraf: UserDraft = {
-        email: 'insert@me.com  ',
-        passwordHash: 'hashed_password',
-        lastname: 'Me',
-        firstname: 'Insert',
+      const userToPersist: CreateUserPersistence = {
+        email: 'new@user.com',
+        password: 'hashed_password',
+        lastname: 'user',
+        firstname: 'new',
       };
 
       it('should persist a user in the database and return a UserEntity', async () => {
-        const result = await userRepository.create(userDraf);
+        const result = await userRepository.create(userToPersist);
 
         expect(result.id).toBeDefined();
 
@@ -159,10 +157,10 @@ describe('User module integration', () => {
 
         expect(userInDb).toBeDefined();
         expect(userInDb?.id).toMatch(UUID_V4_REGEX);
-        expect(userInDb?.email).toBe(userDraf.email);
-        expect(userInDb?.password).toBe(userDraf.passwordHash);
-        expect(userInDb?.lastname).toBe(userDraf.lastname);
-        expect(userInDb?.firstname).toBe(userDraf.firstname);
+        expect(userInDb?.email).toBe(userToPersist.email);
+        expect(userInDb?.password).toBe(userToPersist.password);
+        expect(userInDb?.lastname).toBe(userToPersist.lastname);
+        expect(userInDb?.firstname).toBe(userToPersist.firstname);
         expect(userInDb?.createdAt).toBeInstanceOf(Date);
         expect(userInDb?.updatedAt).toBeInstanceOf(Date);
         expect(userInDb?.deletedAt).toBeNull();
@@ -183,7 +181,7 @@ describe('User module integration', () => {
         try {
           await userRepository.create({
             email: INSERTED_USER.email,
-            passwordHash: 'hashed',
+            password: 'hashed',
             firstname: null,
             lastname: null,
           });
@@ -211,7 +209,7 @@ describe('User module integration', () => {
           .spyOn(prisma.client.user, 'create')
           .mockRejectedValueOnce(unexpectedError);
 
-        await expect(userRepository.create(userDraf)).rejects.toThrow(
+        await expect(userRepository.create(userToPersist)).rejects.toThrow(
           'Unexpected DB crash',
         );
       });

@@ -77,9 +77,9 @@ describe('UserService', () => {
       expect(userRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           email: 'john@doe.com',
-          passwordHash: expectedHash,
-          lastname: undefined,
-          firstname: undefined,
+          password: expectedHash,
+          lastname: null,
+          firstname: null,
         }),
       );
     });

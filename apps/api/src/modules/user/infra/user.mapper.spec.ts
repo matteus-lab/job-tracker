@@ -1,11 +1,8 @@
 import { UserModel } from '@generated/models';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
-
-import { CreateUserPersistence } from './persistence/createUser.persistence';
 import { UserResponseDto } from './dto/response/user.response.dto';
 import { UserMapper } from './user.mapper';
-import { UserDraft } from '../domain/user.repository.port';
 
 describe('UserMapper', () => {
   const USER_MODEL_STUB: UserModel = {
@@ -27,40 +24,6 @@ describe('UserMapper', () => {
     createdAt: new Date('2026-01-01T00:00:00Z'),
     updatedAt: new Date('2026-01-01T00:00:00Z'),
     deletedAt: null,
-  });
-
-  describe('toPersistence', () => {
-    it('should transform maximal userDraft (domain) into persistence (infra)', () => {
-      const userDraft: UserDraft = {
-        email: 'john@doe.com',
-        passwordHash: 'hashed-password',
-        lastname: 'Doe',
-        firstname: 'John',
-      };
-
-      const persistenceUser: CreateUserPersistence =
-        UserMapper.toPersistence(userDraft);
-
-      expect(persistenceUser).toEqual({
-        email: 'john@doe.com',
-        password: 'hashed-password',
-        lastname: 'Doe',
-        firstname: 'John',
-      });
-    });
-
-    it('should transform minimal userDraft (domain) into persistence (infra)', () => {
-      const userDraft: UserDraft = {
-        email: 'john@doe.com',
-        passwordHash: 'hashed-password',
-      };
-
-      const persistenceUser: CreateUserPersistence =
-        UserMapper.toPersistence(userDraft);
-
-      expect(persistenceUser.lastname).toBeNull();
-      expect(persistenceUser.firstname).toBeNull();
-    });
   });
 
   describe('toEntity', () => {

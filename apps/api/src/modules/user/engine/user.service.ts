@@ -7,7 +7,6 @@ import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
 import {
   USER_REPOSITORY_PORT_TOKEN,
-  type UserDraft,
   type UserRepositoryPort,
 } from '../domain/user.repository.port';
 import { CreateUserCommand } from './commands/createUser.command';
@@ -27,14 +26,12 @@ export class UserService {
     const normalizedEmail = command.email.trim().toLowerCase();
     const hashedPassword = await this.hashingAdapter.hash(command.password);
 
-    const userDraft: UserDraft = {
+    const userEntity = await this.userRepositoryAdapter.create({
       email: normalizedEmail,
-      passwordHash: hashedPassword,
-      lastname: command.lastname,
-      firstname: command.firstname,
-    };
-
-    const userEntity = await this.userRepositoryAdapter.create(userDraft);
+      password: hashedPassword,
+      lastname: command.lastname ?? null,
+      firstname: command.firstname ?? null,
+    });
 
     this.logger.log(
       {

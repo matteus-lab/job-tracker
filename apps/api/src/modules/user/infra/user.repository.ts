@@ -7,11 +7,8 @@ import { Prisma, PrismaClient } from '@generated/client';
 import { UserMapper } from './user.mapper';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
-import {
-  type UserRepositoryPort,
-  UserDraft,
-} from '../domain/user.repository.port';
-import { CreateUserPersistence } from './persistence/createUser.persistence';
+import { type UserRepositoryPort } from '../domain/user.repository.port';
+import { CreateUserPersistence } from '../domain/persistence/createUser.persistence';
 import {
   PERSISTENCE_PORT_TOKEN,
   type PersistencePort,
@@ -28,13 +25,10 @@ export class UserRepository implements UserRepositoryPort {
     return this.persistenceAdapter.client as PrismaClient;
   }
 
-  async create(userDraft: UserDraft): Promise<UserEntity> {
+  async create(persistence: CreateUserPersistence): Promise<UserEntity> {
     try {
-      const createUserPersistence: CreateUserPersistence =
-        UserMapper.toPersistence(userDraft);
-
       const userModel = await this.db.user.create({
-        data: createUserPersistence,
+        data: persistence,
       });
 
       return UserMapper.toEntity(userModel);

@@ -3,11 +3,11 @@ import { PrismaClient, Prisma } from '@generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { ConfigService } from '@nestjs/config';
 import { AsyncLocalStorage } from 'async_hooks';
-import { ITransactionManager } from 'src/modules/global/database/domain/transaction-manager.interface';
+import { DatabasePort } from 'src/modules/global/database/domain/database.port';
 
 @Injectable()
 export class PrismaAdapter
-  implements OnModuleInit, OnModuleDestroy, ITransactionManager
+  implements OnModuleInit, OnModuleDestroy, DatabasePort
 {
   private readonly _prisma: PrismaClient;
   private readonly als = new AsyncLocalStorage<Prisma.TransactionClient>();

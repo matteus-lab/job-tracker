@@ -1,4 +1,4 @@
-export const ITRANSACTION_MANAGER_TOKEN = 'ITRANSACTION_MANAGER_TOKEN';
+export const DATABASE_PORT_TOKEN = 'DATABASE_PORT_TOKEN';
 
 /*
  * Port/Adapter + Dependency inversion
@@ -10,6 +10,6 @@ export const ITRANSACTION_MANAGER_TOKEN = 'ITRANSACTION_MANAGER_TOKEN';
  * to run a transaction without knowing
  * how the transaction is managed
  */
-export interface ITransactionManager {
+export interface DatabasePort {
   runInTransaction<T>(work: () => Promise<T>): Promise<T>;
 }

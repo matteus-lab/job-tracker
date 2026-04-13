@@ -7,9 +7,9 @@ import {
 } from 'src/core/exceptions/business.exceptions';
 
 import {
-  ITRANSACTION_MANAGER_TOKEN,
-  type ITransactionManager,
-} from 'src/modules/global/database/domain/transaction-manager.interface';
+  DATABASE_PORT_TOKEN,
+  type DatabasePort,
+} from 'src/modules/global/database/domain/database.port';
 
 import {
   HASHING_PORT_TOKEN,
@@ -39,8 +39,8 @@ export class AuthService {
     private readonly sessionService: SessionService,
     private readonly jwtService: JwtService,
 
-    @Inject(ITRANSACTION_MANAGER_TOKEN)
-    private readonly txManager: ITransactionManager,
+    @Inject(DATABASE_PORT_TOKEN)
+    private readonly txManager: DatabasePort,
 
     @Inject(HASHING_PORT_TOKEN)
     private readonly hashingAdapter: HashingPort,

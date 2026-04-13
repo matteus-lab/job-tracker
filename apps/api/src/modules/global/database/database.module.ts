@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaAdapter } from './infra/prisma.adapter';
-import { ITRANSACTION_MANAGER_TOKEN } from 'src/modules/global/database/domain/transaction-manager.interface';
+import { DATABASE_PORT_TOKEN } from 'src/modules/global/database/domain/database.port';
 
 @Global()
 @Module({
@@ -9,10 +9,10 @@ import { ITRANSACTION_MANAGER_TOKEN } from 'src/modules/global/database/domain/t
   providers: [
     PrismaAdapter,
     {
-      provide: ITRANSACTION_MANAGER_TOKEN,
+      provide: DATABASE_PORT_TOKEN,
       useExisting: PrismaAdapter,
     },
   ],
-  exports: [PrismaAdapter, ITRANSACTION_MANAGER_TOKEN],
+  exports: [PrismaAdapter, DATABASE_PORT_TOKEN],
 })
 export class DatabaseModule {}

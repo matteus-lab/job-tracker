@@ -40,7 +40,7 @@ const SESSION_ENTITY_STUB = new SessionEntity({
 });
 
 const AUTH_RESULT: AuthResult = {
-  userEntity: USER_ENTITY_STUB,
+  user: USER_ENTITY_STUB,
   jwtToken: 'jwt',
   refreshToken: 'refresh',
   expiresAt: SESSION_ENTITY_STUB.expiresAt,

@@ -1,4 +1,4 @@
-# Job Tracker API
+# API
 
 A production-ready NestJS backend to follow job interviews.
 

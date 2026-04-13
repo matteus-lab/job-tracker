@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:18-alpine
-    container_name: job-tracker-db
+    container_name: mood-tracker-db
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}

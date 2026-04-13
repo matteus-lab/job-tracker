@@ -27,7 +27,7 @@ async function bootstrap() {
   // 3. SWAGGER : specific to dev environment
   if (configService.get('NODE_ENV') !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('Job Tracker API')
+      .setTitle('Mood Tracker API')
       .setVersion(packageJson.version)
       .build();
 

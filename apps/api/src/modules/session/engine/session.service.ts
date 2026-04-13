@@ -9,7 +9,6 @@ import {
 import { SessionEntity } from '../domain/entities/session.entity';
 import {
   SESSION_REPOSITORY_PORT_TOKEN,
-  SessionDraft,
   type SessionRepositoryPort,
 } from '../domain/session.repository.port';
 import { CreateSessionCommand } from './commands/createSession.command';
@@ -41,16 +40,13 @@ export class SessionService {
 
     const expiresAt = new Date(Date.now() + ms(durationStr));
 
-    const sessionDraft: SessionDraft = {
+    const sessionEntity = await this.sessionRepositoryAdapter.create({
       hashedRefreshToken,
       expiresAt,
       userId: command.userId,
       userAgent: command.userAgent,
       ipAddress: command.ipAddress,
-    };
-
-    const sessionEntity =
-      await this.sessionRepositoryAdapter.create(sessionDraft);
+    });
 
     return {
       sessionEntity,

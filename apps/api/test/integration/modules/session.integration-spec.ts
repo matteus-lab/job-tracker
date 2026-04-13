@@ -10,9 +10,9 @@ import { SessionEntity } from 'src/modules/session/domain/entities/session.entit
 import { SESSION_REPOSITORY_PORT_TOKEN } from 'src/modules/session/domain/session.repository.port';
 import { CreateSessionCommand } from 'src/modules/session/engine/commands/createSession.command';
 import { SessionService } from 'src/modules/session/engine/session.service';
-import { CreateSessionPersistence } from 'src/modules/session/infra/persistence/createSession.persistence';
+import { CreateSessionPersistence } from 'src/modules/session/domain/persistence/createSession.persistence';
 import { SessionRepository } from 'src/modules/session/infra/session.repository';
-import { CreateUserPersistence } from 'src/modules/user/infra/persistence/createUser.persistence';
+import { CreateUserPersistence } from 'src/modules/user/domain/persistence/createUser.persistence';
 
 import { UUID_V4_REGEX } from 'test/constants/regex.constants';
 

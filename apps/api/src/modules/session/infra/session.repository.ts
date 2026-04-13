@@ -1,15 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SessionEntity } from '../domain/entities/session.entity';
-import {
-  SessionRepositoryPort,
-  type SessionDraft,
-} from '../domain/session.repository.port';
+import { SessionRepositoryPort } from '../domain/session.repository.port';
 import { SessionMapper } from './session.mapper';
 import {
   PERSISTENCE_PORT_TOKEN,
   type PersistencePort,
 } from 'src/modules/persistence/domain/persistence.port';
 import { PrismaClient } from '@generated/client';
+import { CreateSessionPersistence } from '../domain/persistence/createSession.persistence';
 
 @Injectable()
 export class SessionRepository implements SessionRepositoryPort {
@@ -22,12 +20,8 @@ export class SessionRepository implements SessionRepositoryPort {
     return this.persistenceAdapter.client as PrismaClient;
   }
 
-  async create(sessionDraft: SessionDraft): Promise<SessionEntity> {
-    const createSessionPersistence = SessionMapper.toPersistence(sessionDraft);
-
-    const sessionModel = await this.client.session.create({
-      data: createSessionPersistence,
-    });
+  async create(data: CreateSessionPersistence): Promise<SessionEntity> {
+    const sessionModel = await this.client.session.create({ data });
 
     return SessionMapper.toEntity(sessionModel);
   }

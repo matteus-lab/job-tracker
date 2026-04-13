@@ -25,11 +25,9 @@ export class UserRepository implements UserRepositoryPort {
     return this.persistenceAdapter.client as PrismaClient;
   }
 
-  async create(persistence: CreateUserPersistence): Promise<UserEntity> {
+  async create(data: CreateUserPersistence): Promise<UserEntity> {
     try {
-      const userModel = await this.db.user.create({
-        data: persistence,
-      });
+      const userModel = await this.db.user.create({ data });
 
       return UserMapper.toEntity(userModel);
     } catch (e) {

@@ -8,10 +8,10 @@ import {
 } from 'src/modules/hashing/domain/hashing.port';
 import { SessionEntity } from '../domain/entities/session.entity';
 import {
-  ISESSION_REPOSITORY_TOKEN,
+  SESSION_REPOSITORY_PORT_TOKEN,
   SessionDraft,
-  type ISessionRepository,
-} from '../domain/session.repository.interface';
+  type SessionRepositoryPort,
+} from '../domain/session.repository.port';
 import { CreateSessionCommand } from './commands/createSession.command';
 
 @Injectable()
@@ -22,8 +22,8 @@ export class SessionService {
     private readonly configService: ConfigService,
     @Inject(HASHING_PORT_TOKEN)
     private readonly hashingAdapter: HashingPort,
-    @Inject(ISESSION_REPOSITORY_TOKEN)
-    private readonly repository: ISessionRepository,
+    @Inject(SESSION_REPOSITORY_PORT_TOKEN)
+    private readonly sessionRepositoryAdapter: SessionRepositoryPort,
   ) {}
 
   async create(command: CreateSessionCommand): Promise<{
@@ -49,7 +49,8 @@ export class SessionService {
       ipAddress: command.ipAddress,
     };
 
-    const sessionEntity = await this.repository.create(sessionDraft);
+    const sessionEntity =
+      await this.sessionRepositoryAdapter.create(sessionDraft);
 
     return {
       sessionEntity,
@@ -64,13 +65,17 @@ export class SessionService {
       await this.hashingAdapter.generateFingerprint(rawRefreshToken);
 
     const session =
-      await this.repository.findByHashedRefreshToken(hashedRefreshToken);
+      await this.sessionRepositoryAdapter.findByHashedRefreshToken(
+        hashedRefreshToken,
+      );
 
     if (!session) return null;
 
     const isExpired = session.expiresAt.getTime() < Date.now();
     if (isExpired) {
-      await this.repository.deleteManyByHashedRefreshToken(hashedRefreshToken);
+      await this.sessionRepositoryAdapter.deleteManyByHashedRefreshToken(
+        hashedRefreshToken,
+      );
       return null;
     }
 
@@ -81,13 +86,16 @@ export class SessionService {
     const hashedRefreshToken =
       await this.hashingAdapter.generateFingerprint(refreshToken);
 
-    await this.repository.deleteManyByHashedRefreshToken(hashedRefreshToken);
+    await this.sessionRepositoryAdapter.deleteManyByHashedRefreshToken(
+      hashedRefreshToken,
+    );
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async expiredSessionsCleanup() {
     try {
-      const deletedCount = await this.repository.deleteAllExpired();
+      const deletedCount =
+        await this.sessionRepositoryAdapter.deleteAllExpired();
 
       this.logger.log(
         `Cleanup successful. Removed ${deletedCount} expired sessions.`,

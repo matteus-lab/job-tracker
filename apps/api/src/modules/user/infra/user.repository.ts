@@ -1,29 +1,39 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   ErrorCodes,
   AppBusinessException,
 } from 'src/core/exceptions/business.exceptions';
-import { Prisma } from '@generated/client';
-import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
+import { Prisma, PrismaClient } from '@generated/client';
 import { UserMapper } from './user.mapper';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
 import {
-  IUserRepository,
+  type UserRepositoryPort,
   UserDraft,
-} from '../domain/user.repository.interface';
+} from '../domain/user.repository.port';
 import { CreateUserPersistence } from './persistence/createUser.persistence';
+import {
+  PERSISTENCE_PORT_TOKEN,
+  type PersistencePort,
+} from 'src/modules/persistence/domain/persistence.port';
 
 @Injectable()
-export class UserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaAdapter) {}
+export class UserRepository implements UserRepositoryPort {
+  constructor(
+    @Inject(PERSISTENCE_PORT_TOKEN)
+    private readonly persistenceAdapter: PersistencePort,
+  ) {}
+
+  private get db() {
+    return this.persistenceAdapter.client as PrismaClient;
+  }
 
   async create(userDraft: UserDraft): Promise<UserEntity> {
     try {
       const createUserPersistence: CreateUserPersistence =
         UserMapper.toPersistence(userDraft);
 
-      const userModel = await this.prisma.client.user.create({
+      const userModel = await this.db.user.create({
         data: createUserPersistence,
       });
 
@@ -48,7 +58,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async findById(id: string): Promise<UserEntity | null> {
-    const userModel = await this.prisma.client.user.findUnique({
+    const userModel = await this.db.user.findUnique({
       where: { id },
     });
 
@@ -59,7 +69,7 @@ export class UserRepository implements IUserRepository {
   async findByEmailWithPassword(
     email: string,
   ): Promise<UserWithPasswordEntity | null> {
-    const userModel = await this.prisma.client.user.findUnique({
+    const userModel = await this.db.user.findUnique({
       where: { email },
     });
 

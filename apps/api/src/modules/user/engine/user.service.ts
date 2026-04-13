@@ -6,10 +6,10 @@ import {
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
 import {
-  IUSER_REPOSITORY_TOKEN,
+  USER_REPOSITORY_PORT_TOKEN,
   type UserDraft,
-  type IUserRepository,
-} from '../domain/user.repository.interface';
+  type UserRepositoryPort,
+} from '../domain/user.repository.port';
 import { CreateUserCommand } from './commands/createUser.command';
 
 @Injectable()
@@ -19,8 +19,8 @@ export class UserService {
   constructor(
     @Inject(HASHING_PORT_TOKEN)
     private readonly hashingAdapter: HashingPort,
-    @Inject(IUSER_REPOSITORY_TOKEN)
-    private readonly userRepository: IUserRepository,
+    @Inject(USER_REPOSITORY_PORT_TOKEN)
+    private readonly userRepositoryAdapter: UserRepositoryPort,
   ) {}
 
   async create(command: CreateUserCommand): Promise<UserEntity> {
@@ -34,7 +34,7 @@ export class UserService {
       firstname: command.firstname,
     };
 
-    const userEntity = await this.userRepository.create(userDraft);
+    const userEntity = await this.userRepositoryAdapter.create(userDraft);
 
     this.logger.log(
       {
@@ -51,7 +51,7 @@ export class UserService {
   }
 
   async getById(id: string): Promise<UserEntity | null> {
-    const userEntity = await this.userRepository.findById(id);
+    const userEntity = await this.userRepositoryAdapter.findById(id);
 
     return userEntity;
   }
@@ -66,7 +66,7 @@ export class UserService {
     const normalizedEmail = email.trim().toLowerCase();
 
     const userWithPasswordEntity =
-      await this.userRepository.findByEmailWithPassword(normalizedEmail);
+      await this.userRepositoryAdapter.findByEmailWithPassword(normalizedEmail);
 
     return userWithPasswordEntity;
   }

@@ -7,9 +7,9 @@ import {
 } from 'src/core/exceptions/business.exceptions';
 
 import {
-  DATABASE_PORT_TOKEN,
-  type DatabasePort,
-} from 'src/modules/global/database/domain/database.port';
+  PERSISTENCE_PORT_TOKEN,
+  type PersistencePort,
+} from 'src/modules/persistence/domain/persistence.port';
 
 import {
   HASHING_PORT_TOKEN,
@@ -39,8 +39,8 @@ export class AuthService {
     private readonly sessionService: SessionService,
     private readonly jwtService: JwtService,
 
-    @Inject(DATABASE_PORT_TOKEN)
-    private readonly txManager: DatabasePort,
+    @Inject(PERSISTENCE_PORT_TOKEN)
+    private readonly persistenceAdapter: PersistencePort,
 
     @Inject(HASHING_PORT_TOKEN)
     private readonly hashingAdapter: HashingPort,
@@ -51,7 +51,7 @@ export class AuthService {
   }
 
   async register(command: RegisterCommand): Promise<AuthResult> {
-    return await this.txManager.runInTransaction(async () => {
+    return await this.persistenceAdapter.runInTransaction(async () => {
       const userEntity = await this.userService.create({
         email: command.email,
         password: command.password,

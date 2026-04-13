@@ -4,7 +4,7 @@ import { UserModel } from '@generated/models';
 import { AppModule } from 'src/app.module';
 import { UUID_V4_REGEX } from 'test/constants/regex.constants';
 
-import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
+import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 import {
   AppBusinessException,
   ErrorCodes,
@@ -12,9 +12,9 @@ import {
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
 import {
-  IUSER_REPOSITORY_TOKEN,
+  USER_REPOSITORY_PORT_TOKEN,
   UserDraft,
-} from 'src/modules/user/domain/user.repository.interface';
+} from 'src/modules/user/domain/user.repository.port';
 import { CreateUserCommand } from 'src/modules/user/engine/commands/createUser.command';
 import { UserService } from 'src/modules/user/engine/user.service';
 import { UserRepository } from 'src/modules/user/infra/user.repository';
@@ -33,7 +33,9 @@ describe('User module integration', () => {
     }).compile();
 
     userService = moduleFixture.get<UserService>(UserService);
-    userRepository = moduleFixture.get<UserRepository>(IUSER_REPOSITORY_TOKEN);
+    userRepository = moduleFixture.get<UserRepository>(
+      USER_REPOSITORY_PORT_TOKEN,
+    );
     prisma = moduleFixture.get(PrismaAdapter);
   });
 

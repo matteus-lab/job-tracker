@@ -5,7 +5,7 @@ import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.enti
 import { CreateUserPersistence } from './persistence/createUser.persistence';
 import { UserResponseDto } from './dto/response/user.response.dto';
 import { UserMapper } from './user.mapper';
-import { UserDraft } from '../domain/user.repository.interface';
+import { UserDraft } from '../domain/user.repository.port';
 
 describe('UserMapper', () => {
   const USER_MODEL_STUB: UserModel = {

@@ -3,11 +3,11 @@
 import { createHash } from 'node:crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
-import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
+import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 import { SessionModel } from '@generated/models';
 
 import { SessionEntity } from 'src/modules/session/domain/entities/session.entity';
-import { ISESSION_REPOSITORY_TOKEN } from 'src/modules/session/domain/session.repository.interface';
+import { SESSION_REPOSITORY_PORT_TOKEN } from 'src/modules/session/domain/session.repository.port';
 import { CreateSessionCommand } from 'src/modules/session/engine/commands/createSession.command';
 import { SessionService } from 'src/modules/session/engine/session.service';
 import { CreateSessionPersistence } from 'src/modules/session/infra/persistence/createSession.persistence';
@@ -31,7 +31,7 @@ describe('Session module integration', () => {
 
     sessionService = moduleFixture.get<SessionService>(SessionService);
     sessionRepository = moduleFixture.get<SessionRepository>(
-      ISESSION_REPOSITORY_TOKEN,
+      SESSION_REPOSITORY_PORT_TOKEN,
     );
     prisma = moduleFixture.get(PrismaAdapter);
   });

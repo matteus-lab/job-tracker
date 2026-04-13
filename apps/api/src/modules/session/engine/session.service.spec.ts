@@ -8,9 +8,9 @@ import {
 } from 'src/modules/hashing/domain/hashing.port';
 import { SessionEntity } from '../domain/entities/session.entity';
 import {
-  ISESSION_REPOSITORY_TOKEN,
-  ISessionRepository,
-} from '../domain/session.repository.interface';
+  SESSION_REPOSITORY_PORT_TOKEN,
+  SessionRepositoryPort,
+} from '../domain/session.repository.port';
 import { CreateSessionCommand } from './commands/createSession.command';
 import { SessionService } from './session.service';
 
@@ -30,7 +30,7 @@ describe('SessionService', () => {
   let service: SessionService;
   let configService: jest.Mocked<ConfigService>;
   let hashingAdapter: jest.Mocked<HashingPort>;
-  let sessionRepository: jest.Mocked<ISessionRepository>;
+  let sessionRepository: jest.Mocked<SessionRepositoryPort>;
 
   beforeEach(async () => {
     jest.useFakeTimers().setSystemTime(NOW);
@@ -54,7 +54,7 @@ describe('SessionService', () => {
           },
         },
         {
-          provide: ISESSION_REPOSITORY_TOKEN,
+          provide: SESSION_REPOSITORY_PORT_TOKEN,
           useValue: {
             create: jest.fn(),
             findByHashedRefreshToken: jest.fn(),
@@ -68,7 +68,7 @@ describe('SessionService', () => {
     service = module.get(SessionService);
     configService = module.get(ConfigService);
     hashingAdapter = module.get(HASHING_PORT_TOKEN);
-    sessionRepository = module.get(ISESSION_REPOSITORY_TOKEN);
+    sessionRepository = module.get(SESSION_REPOSITORY_PORT_TOKEN);
   });
 
   afterEach(() => {

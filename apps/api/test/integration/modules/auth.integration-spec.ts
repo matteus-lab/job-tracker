@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
-import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
+import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 import { AuthService } from 'src/modules/auth/engine/auth.service';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';
 import { SessionModel, UserModel } from '@generated/models';

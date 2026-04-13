@@ -1,4 +1,4 @@
-export const HASHING_PORT_TOKEN = 'IHASHING_PORT_TOKEN';
+export const HASHING_PORT_TOKEN = 'HASHING_PORT_TOKEN';
 
 export interface HashingPort {
   /**

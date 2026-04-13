@@ -3,11 +3,11 @@ import { PrismaClient, Prisma } from '@generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { ConfigService } from '@nestjs/config';
 import { AsyncLocalStorage } from 'async_hooks';
-import { DatabasePort } from 'src/modules/global/database/domain/database.port';
+import { PersistencePort } from 'src/modules/persistence/domain/persistence.port';
 
 @Injectable()
 export class PrismaAdapter
-  implements OnModuleInit, OnModuleDestroy, DatabasePort
+  implements OnModuleInit, OnModuleDestroy, PersistencePort
 {
   private readonly _prisma: PrismaClient;
   private readonly als = new AsyncLocalStorage<Prisma.TransactionClient>();
@@ -30,10 +30,7 @@ export class PrismaAdapter
   }
 
   get client(): Prisma.TransactionClient {
-    const tx = this.als.getStore();
-
-    if (tx) return tx;
-    return this._prisma;
+    return this.als.getStore() || this._prisma;
   }
 
   async runInTransaction<T>(work: () => Promise<T>): Promise<T> {

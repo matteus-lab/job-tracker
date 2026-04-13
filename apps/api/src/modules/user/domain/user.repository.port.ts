@@ -1,7 +1,7 @@
 import { UserEntity } from './entities/user.entity';
 import { UserWithPasswordEntity } from './entities/userWithPassword.entity';
 
-export const IUSER_REPOSITORY_TOKEN = 'IUSER_REPOSITORY_TOKEN';
+export const USER_REPOSITORY_PORT_TOKEN = 'USER_REPOSITORY_PORT_TOKEN';
 
 export type UserDraft = {
   email: string;
@@ -10,7 +10,7 @@ export type UserDraft = {
   firstname?: string | null;
 };
 
-export interface IUserRepository {
+export interface UserRepositoryPort {
   create(data: UserDraft): Promise<UserEntity>;
   findById(id: string): Promise<UserEntity | null>;
   findByEmailWithPassword(

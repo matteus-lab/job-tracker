@@ -1,4 +1,4 @@
-export const DATABASE_PORT_TOKEN = 'DATABASE_PORT_TOKEN';
+export const PERSISTENCE_PORT_TOKEN = 'PERSISTENCE_PORT_TOKEN';
 
 /*
  * Port/Adapter + Dependency inversion
@@ -10,6 +10,7 @@ export const DATABASE_PORT_TOKEN = 'DATABASE_PORT_TOKEN';
  * to run a transaction without knowing
  * how the transaction is managed
  */
-export interface DatabasePort {
+export interface PersistencePort {
   runInTransaction<T>(work: () => Promise<T>): Promise<T>;
+  readonly client;
 }

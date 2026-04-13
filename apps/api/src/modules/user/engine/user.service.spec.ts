@@ -7,9 +7,9 @@ import {
 } from 'src/modules/hashing/domain/hashing.port';
 
 import {
-  IUSER_REPOSITORY_TOKEN,
-  IUserRepository,
-} from '../domain/user.repository.interface';
+  USER_REPOSITORY_PORT_TOKEN,
+  UserRepositoryPort,
+} from '../domain/user.repository.port';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserService } from './user.service';
 import { CreateUserCommand } from './commands/createUser.command';
@@ -26,7 +26,7 @@ const USER_ENTITY_STUB = new UserEntity({
 
 describe('UserService', () => {
   let userService: UserService;
-  let userRepository: jest.Mocked<IUserRepository>;
+  let userRepository: jest.Mocked<UserRepositoryPort>;
   let hashingAdapter: jest.Mocked<HashingPort>;
 
   beforeEach(async () => {
@@ -34,7 +34,7 @@ describe('UserService', () => {
       providers: [
         UserService,
         {
-          provide: IUSER_REPOSITORY_TOKEN,
+          provide: USER_REPOSITORY_PORT_TOKEN,
           useValue: {
             create: jest.fn(),
             findByEmailWithPassword: jest.fn(),
@@ -50,7 +50,7 @@ describe('UserService', () => {
     }).compile();
 
     userService = module.get(UserService);
-    userRepository = module.get(IUSER_REPOSITORY_TOKEN);
+    userRepository = module.get(USER_REPOSITORY_PORT_TOKEN);
     hashingAdapter = module.get(HASHING_PORT_TOKEN);
   });
 

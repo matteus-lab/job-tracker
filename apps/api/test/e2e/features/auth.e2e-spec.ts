@@ -9,7 +9,7 @@ import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';
 import { AuthResponseDto } from 'src/modules/auth/infra/dto/response/auth.response.dto';
 import { UserResponseDto } from 'src/modules/user/infra/dto/response/user.response.dto';
-import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
+import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 import { ISO_DATE_REGEX, UUID_V4_REGEX } from 'test/constants/regex.constants';
 import { LoginRequestDto } from 'src/modules/auth/infra/dto/request/login.request.dto';
 import {

@@ -7,9 +7,11 @@ import { UserModule } from 'src/modules/user/user.module';
 import { SessionModule } from 'src/modules/session/session.module';
 import { JwtAuthGuard } from 'src/modules/auth/infra/guard/jwt-auth.guard';
 import { HashingModule } from '../hashing/hashing.module';
+import { PersistenceModule } from '../persistence/persistence.module';
 
 @Module({
   imports: [
+    PersistenceModule,
     HashingModule,
     UserModule,
     SessionModule,

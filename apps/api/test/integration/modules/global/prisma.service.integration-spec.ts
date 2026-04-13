@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
-import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
+import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 
 describe('prisma Integration', () => {
   let moduleFixture: TestingModule;

@@ -2,7 +2,7 @@ import ms from 'ms';
 import { SessionModel } from '@generated/models';
 import { SessionEntity } from '../domain/entities/session.entity';
 import { SessionMapper } from './session.mapper';
-import { SessionDraft } from '../domain/session.repository.interface';
+import { SessionDraft } from '../domain/session.repository.port';
 
 describe('SessionMapper', () => {
   const FIXED_DATE = new Date('2026-01-01T00:00:00Z');

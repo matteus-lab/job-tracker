@@ -13,7 +13,7 @@ import { UserService } from 'src/modules/user/engine/user.service';
 import { SessionService } from 'src/modules/session/engine/session.service';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { SessionEntity } from 'src/modules/session/domain/entities/session.entity';
-import { DATABASE_PORT_TOKEN } from 'src/modules/global/database/domain/database.port';
+import { PERSISTENCE_PORT_TOKEN } from 'src/modules/persistence/domain/persistence.port';
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
 import {
   AppBusinessException,
@@ -93,7 +93,7 @@ describe('AuthService', () => {
           },
         },
         {
-          provide: DATABASE_PORT_TOKEN,
+          provide: PERSISTENCE_PORT_TOKEN,
           useValue: {
             runInTransaction: (work: () => Promise<unknown>) => work(),
           },

@@ -15,9 +15,6 @@ import { AppController } from './app.controller';
 // Dev controller (not available in production)
 import { DevController } from './dev.controller';
 
-// Global modules
-import { DatabaseModule } from './modules/global/database/database.module';
-
 // App modules
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { SessionModule } from 'src/modules/session/session.module';
@@ -93,9 +90,6 @@ if (process.env.NODE_ENV !== 'production') {
         },
       }),
     }),
-    // Global
-    DatabaseModule,
-
     // App
     AuthModule,
     SessionModule,

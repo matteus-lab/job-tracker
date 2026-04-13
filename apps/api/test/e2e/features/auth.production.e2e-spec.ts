@@ -11,7 +11,7 @@ import { configureApp } from 'src/configure-app';
 
 import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
 import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
-import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
+import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 import { getStorageToken, ThrottlerStorageService } from '@nestjs/throttler';
 
 describe('Production e2e', () => {

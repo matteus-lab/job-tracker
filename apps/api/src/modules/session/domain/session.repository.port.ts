@@ -1,6 +1,6 @@
 import { SessionEntity } from './entities/session.entity';
 
-export const ISESSION_REPOSITORY_TOKEN = 'ISESSION_REPOSITORY_TOKEN';
+export const SESSION_REPOSITORY_PORT_TOKEN = 'SESSION_REPOSITORY_PORT_TOKEN';
 
 export type SessionDraft = {
   hashedRefreshToken: string;
@@ -10,7 +10,7 @@ export type SessionDraft = {
   ipAddress?: string | null;
 };
 
-export interface ISessionRepository {
+export interface SessionRepositoryPort {
   create(data: SessionDraft): Promise<SessionEntity>;
 
   findByHashedRefreshToken(

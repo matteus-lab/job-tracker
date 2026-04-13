@@ -1,6 +1,6 @@
 import { SessionModel } from '@generated/models';
 import { SessionEntity } from '../domain/entities/session.entity';
-import { SessionDraft } from '../domain/session.repository.interface';
+import { SessionDraft } from '../domain/session.repository.port';
 import { CreateSessionPersistence } from './persistence/createSession.persistence';
 
 export const SessionMapper = {

@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 
-import { ISESSION_REPOSITORY_TOKEN } from './domain/session.repository.interface';
+import { SESSION_REPOSITORY_PORT_TOKEN } from './domain/session.repository.port';
 import { SessionService } from './engine/session.service';
 import { SessionRepository } from './infra/session.repository';
 import { HashingModule } from '../hashing/hashing.module';
+import { PersistenceModule } from '../persistence/persistence.module';
 
 @Module({
-  imports: [HashingModule],
+  imports: [HashingModule, PersistenceModule],
   providers: [
     SessionService,
     {
-      provide: ISESSION_REPOSITORY_TOKEN,
+      provide: SESSION_REPOSITORY_PORT_TOKEN,
       useClass: SessionRepository,
     },
   ],

@@ -2,9 +2,9 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import {
-  IHASHING_SERVICE_TOKEN,
-  IHashingService,
-} from 'src/modules/hashing/domain/hashing.service.interface';
+  HASHING_PORT_TOKEN,
+  HashingPort,
+} from 'src/modules/hashing/domain/hashing.port';
 
 import {
   IUSER_REPOSITORY_TOKEN,
@@ -27,7 +27,7 @@ const USER_ENTITY_STUB = new UserEntity({
 describe('UserService', () => {
   let userService: UserService;
   let userRepository: jest.Mocked<IUserRepository>;
-  let hashingService: jest.Mocked<IHashingService>;
+  let hashingAdapter: jest.Mocked<HashingPort>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,7 +41,7 @@ describe('UserService', () => {
           },
         },
         {
-          provide: IHASHING_SERVICE_TOKEN,
+          provide: HASHING_PORT_TOKEN,
           useValue: {
             hash: jest.fn(),
           },
@@ -51,7 +51,7 @@ describe('UserService', () => {
 
     userService = module.get(UserService);
     userRepository = module.get(IUSER_REPOSITORY_TOKEN);
-    hashingService = module.get(IHASHING_SERVICE_TOKEN);
+    hashingAdapter = module.get(HASHING_PORT_TOKEN);
   });
 
   afterEach(() => {
@@ -67,12 +67,12 @@ describe('UserService', () => {
 
       const expectedHash = 'hashed_faked_password';
 
-      hashingService.hash.mockResolvedValue(expectedHash);
+      hashingAdapter.hash.mockResolvedValue(expectedHash);
       userRepository.create.mockResolvedValue(USER_ENTITY_STUB);
 
       await userService.create(createUserCommand);
 
-      expect(hashingService.hash).toHaveBeenCalledWith('Password123!');
+      expect(hashingAdapter.hash).toHaveBeenCalledWith('Password123!');
 
       expect(userRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({

@@ -1,6 +1,6 @@
-export const IHASHING_SERVICE_TOKEN = 'IHASHING_SERVICE_TOKEN';
+export const HASHING_PORT_TOKEN = 'IHASHING_PORT_TOKEN';
 
-export interface IHashingService {
+export interface HashingPort {
   /**
    * High-security hash (Slow, Salt, Non-deterministic)
    * Usage : password, high security secrets

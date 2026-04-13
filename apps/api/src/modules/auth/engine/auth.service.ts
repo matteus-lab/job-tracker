@@ -12,9 +12,9 @@ import {
 } from 'src/modules/global/database/domain/transaction-manager.interface';
 
 import {
-  IHASHING_SERVICE_TOKEN,
-  type IHashingService,
-} from 'src/modules/hashing/domain/hashing.service.interface';
+  HASHING_PORT_TOKEN,
+  type HashingPort,
+} from 'src/modules/hashing/domain/hashing.port';
 
 import { JwtPayload } from 'src/modules/auth/domain/types/jwt-payload.interface';
 
@@ -42,8 +42,8 @@ export class AuthService {
     @Inject(ITRANSACTION_MANAGER_TOKEN)
     private readonly txManager: ITransactionManager,
 
-    @Inject(IHASHING_SERVICE_TOKEN)
-    private readonly hashingService: IHashingService,
+    @Inject(HASHING_PORT_TOKEN)
+    private readonly hashingAdapter: HashingPort,
   ) {}
 
   private generateJwtToken(payload: JwtPayload) {
@@ -94,7 +94,7 @@ export class AuthService {
 
     if (!userWithPasswordEntity) throw invalidCredentialError;
 
-    const isPasswordValid = await this.hashingService.verify(
+    const isPasswordValid = await this.hashingAdapter.verify(
       command.password,
       userWithPasswordEntity.password,
     );

@@ -3,9 +3,9 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import {
-  IHASHING_SERVICE_TOKEN,
-  type IHashingService,
-} from 'src/modules/hashing/domain/hashing.service.interface';
+  HASHING_PORT_TOKEN,
+  type HashingPort,
+} from 'src/modules/hashing/domain/hashing.port';
 import { SessionEntity } from '../domain/entities/session.entity';
 import {
   ISESSION_REPOSITORY_TOKEN,
@@ -20,8 +20,8 @@ export class SessionService {
 
   constructor(
     private readonly configService: ConfigService,
-    @Inject(IHASHING_SERVICE_TOKEN)
-    private readonly hashingService: IHashingService,
+    @Inject(HASHING_PORT_TOKEN)
+    private readonly hashingAdapter: HashingPort,
     @Inject(ISESSION_REPOSITORY_TOKEN)
     private readonly repository: ISessionRepository,
   ) {}
@@ -32,7 +32,7 @@ export class SessionService {
   }> {
     const refreshToken = crypto.randomUUID();
     const hashedRefreshToken =
-      await this.hashingService.generateFingerprint(refreshToken);
+      await this.hashingAdapter.generateFingerprint(refreshToken);
 
     const durationStr = this.configService.get<ms.StringValue>(
       'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
@@ -61,7 +61,7 @@ export class SessionService {
     rawRefreshToken: string,
   ): Promise<SessionEntity | null> {
     const hashedRefreshToken =
-      await this.hashingService.generateFingerprint(rawRefreshToken);
+      await this.hashingAdapter.generateFingerprint(rawRefreshToken);
 
     const session =
       await this.repository.findByHashedRefreshToken(hashedRefreshToken);
@@ -79,7 +79,7 @@ export class SessionService {
 
   async deleteByRefreshToken(refreshToken: string): Promise<void> {
     const hashedRefreshToken =
-      await this.hashingService.generateFingerprint(refreshToken);
+      await this.hashingAdapter.generateFingerprint(refreshToken);
 
     await this.repository.deleteManyByHashedRefreshToken(hashedRefreshToken);
   }

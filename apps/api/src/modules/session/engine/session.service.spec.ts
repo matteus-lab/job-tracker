@@ -3,9 +3,9 @@ import ms from 'ms';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import {
-  IHASHING_SERVICE_TOKEN,
-  IHashingService,
-} from 'src/modules/hashing/domain/hashing.service.interface';
+  HASHING_PORT_TOKEN,
+  HashingPort,
+} from 'src/modules/hashing/domain/hashing.port';
 import { SessionEntity } from '../domain/entities/session.entity';
 import {
   ISESSION_REPOSITORY_TOKEN,
@@ -29,7 +29,7 @@ const SESSION_ENTITY_STUB = new SessionEntity({
 describe('SessionService', () => {
   let service: SessionService;
   let configService: jest.Mocked<ConfigService>;
-  let hashingService: jest.Mocked<IHashingService>;
+  let hashingAdapter: jest.Mocked<HashingPort>;
   let sessionRepository: jest.Mocked<ISessionRepository>;
 
   beforeEach(async () => {
@@ -46,7 +46,7 @@ describe('SessionService', () => {
           },
         },
         {
-          provide: IHASHING_SERVICE_TOKEN,
+          provide: HASHING_PORT_TOKEN,
           useValue: {
             hash: jest.fn(),
             generateFingerprint: jest.fn(),
@@ -67,7 +67,7 @@ describe('SessionService', () => {
 
     service = module.get(SessionService);
     configService = module.get(ConfigService);
-    hashingService = module.get(IHASHING_SERVICE_TOKEN);
+    hashingAdapter = module.get(HASHING_PORT_TOKEN);
     sessionRepository = module.get(ISESSION_REPOSITORY_TOKEN);
   });
 
@@ -84,7 +84,7 @@ describe('SessionService', () => {
       const duration = '1w';
 
       jest.spyOn(crypto, 'randomUUID').mockReturnValue(rawToken);
-      hashingService.generateFingerprint.mockResolvedValue(hashToken);
+      hashingAdapter.generateFingerprint.mockResolvedValue(hashToken);
       configService.get.mockReturnValue(duration);
       sessionRepository.create.mockResolvedValue(SESSION_ENTITY_STUB);
 
@@ -96,7 +96,7 @@ describe('SessionService', () => {
 
       const result = await service.create(createSessionCommand);
 
-      expect(hashingService.generateFingerprint).toHaveBeenCalledWith(rawToken);
+      expect(hashingAdapter.generateFingerprint).toHaveBeenCalledWith(rawToken);
 
       expect(sessionRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -114,7 +114,7 @@ describe('SessionService', () => {
     const hashedToken = 'hashed';
 
     it('should return the session if valid and not expired', async () => {
-      hashingService.generateFingerprint.mockResolvedValue(hashedToken);
+      hashingAdapter.generateFingerprint.mockResolvedValue(hashedToken);
       sessionRepository.findByHashedRefreshToken.mockResolvedValue(
         SESSION_ENTITY_STUB,
       );
@@ -134,7 +134,7 @@ describe('SessionService', () => {
         expiresAt: new Date(NOW.getTime() - 1000),
       });
 
-      hashingService.generateFingerprint.mockResolvedValue(hashedToken);
+      hashingAdapter.generateFingerprint.mockResolvedValue(hashedToken);
       sessionRepository.findByHashedRefreshToken.mockResolvedValue(
         expiredSession,
       );
@@ -148,7 +148,7 @@ describe('SessionService', () => {
     });
 
     it('should return null if session does not exists', async () => {
-      hashingService.generateFingerprint.mockResolvedValue(hashedToken);
+      hashingAdapter.generateFingerprint.mockResolvedValue(hashedToken);
       sessionRepository.findByHashedRefreshToken.mockResolvedValue(null);
 
       const result = await service.validateSession(rawToken);

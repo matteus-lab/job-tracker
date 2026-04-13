@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
-  IHASHING_SERVICE_TOKEN,
-  type IHashingService,
-} from 'src/modules/hashing/domain/hashing.service.interface';
+  HASHING_PORT_TOKEN,
+  type HashingPort,
+} from 'src/modules/hashing/domain/hashing.port';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
 import {
@@ -17,15 +17,15 @@ export class UserService {
   private readonly logger = new Logger(UserService.name);
 
   constructor(
-    @Inject(IHASHING_SERVICE_TOKEN)
-    private readonly hashingService: IHashingService,
+    @Inject(HASHING_PORT_TOKEN)
+    private readonly hashingAdapter: HashingPort,
     @Inject(IUSER_REPOSITORY_TOKEN)
     private readonly userRepository: IUserRepository,
   ) {}
 
   async create(command: CreateUserCommand): Promise<UserEntity> {
     const normalizedEmail = command.email.trim().toLowerCase();
-    const hashedPassword = await this.hashingService.hash(command.password);
+    const hashedPassword = await this.hashingAdapter.hash(command.password);
 
     const userDraft: UserDraft = {
       email: normalizedEmail,

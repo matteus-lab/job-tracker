@@ -6,9 +6,9 @@ import { HttpStatus } from '@nestjs/common';
 
 import { AuthResult, AuthService } from './auth.service';
 import {
-  IHASHING_SERVICE_TOKEN,
-  IHashingService,
-} from 'src/modules/hashing/domain/hashing.service.interface';
+  HASHING_PORT_TOKEN,
+  HashingPort,
+} from 'src/modules/hashing/domain/hashing.port';
 import { UserService } from 'src/modules/user/engine/user.service';
 import { SessionService } from 'src/modules/session/engine/session.service';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
@@ -55,7 +55,7 @@ describe('AuthService', () => {
   let jwtService: jest.Mocked<JwtService>;
   let userService: jest.Mocked<UserService>;
   let sessionService: jest.Mocked<SessionService>;
-  let hashingService: jest.Mocked<IHashingService>;
+  let hashingAdapter: jest.Mocked<HashingPort>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -85,7 +85,7 @@ describe('AuthService', () => {
           },
         },
         {
-          provide: IHASHING_SERVICE_TOKEN,
+          provide: HASHING_PORT_TOKEN,
           useValue: {
             hash: jest.fn(),
             generateFingerprint: jest.fn(),
@@ -105,7 +105,7 @@ describe('AuthService', () => {
     jwtService = module.get(JwtService);
     userService = module.get(UserService);
     sessionService = module.get(SessionService);
-    hashingService = module.get(IHASHING_SERVICE_TOKEN);
+    hashingAdapter = module.get(HASHING_PORT_TOKEN);
   });
 
   afterEach(() => {
@@ -181,7 +181,7 @@ describe('AuthService', () => {
       userService.getByEmailWithPassword.mockResolvedValue(
         USER_WITH_PASSWORD_ENTITY_STUB,
       );
-      hashingService.verify.mockResolvedValue(true);
+      hashingAdapter.verify.mockResolvedValue(true);
       sessionService.create.mockResolvedValue({
         sessionEntity: SESSION_ENTITY_STUB,
         refreshToken,
@@ -194,7 +194,7 @@ describe('AuthService', () => {
         loginCommand.email,
       );
 
-      expect(hashingService.verify).toHaveBeenCalledWith(
+      expect(hashingAdapter.verify).toHaveBeenCalledWith(
         loginCommand.password,
         USER_WITH_PASSWORD_ENTITY_STUB.password,
       );
@@ -226,7 +226,7 @@ describe('AuthService', () => {
       userService.getByEmailWithPassword.mockResolvedValue(
         USER_WITH_PASSWORD_ENTITY_STUB,
       );
-      hashingService.verify.mockResolvedValue(false);
+      hashingAdapter.verify.mockResolvedValue(false);
 
       const act = authService.login(loginCommand);
 

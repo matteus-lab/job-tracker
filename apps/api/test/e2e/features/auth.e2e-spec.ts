@@ -13,15 +13,15 @@ import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter'
 import { ISO_DATE_REGEX, UUID_V4_REGEX } from 'test/constants/regex.constants';
 import { LoginRequestDto } from 'src/modules/auth/infra/dto/request/login.request.dto';
 import {
-  IHASHING_SERVICE_TOKEN,
-  IHashingService,
-} from 'src/modules/hashing/domain/hashing.service.interface';
+  HASHING_PORT_TOKEN,
+  HashingPort,
+} from 'src/modules/hashing/domain/hashing.port';
 import { UserModel } from '@generated/models';
 
 describe('Auth Module e2e', () => {
   let app: INestApplication<App>;
   let prisma: PrismaAdapter;
-  let hashingService: IHashingService;
+  let hashingAdapter: HashingPort;
 
   let INSERTED_USER: UserModel;
 
@@ -37,7 +37,7 @@ describe('Auth Module e2e', () => {
     await app.init();
 
     prisma = app.get(PrismaAdapter);
-    hashingService = app.get(IHASHING_SERVICE_TOKEN);
+    hashingAdapter = app.get(HASHING_PORT_TOKEN);
   });
 
   beforeEach(async () => {
@@ -47,7 +47,7 @@ describe('Auth Module e2e', () => {
     INSERTED_USER = await prisma.client.user.create({
       data: {
         email: 'already@existing.com',
-        password: await hashingService.hash('Password123!'),
+        password: await hashingAdapter.hash('Password123!'),
         lastname: 'Already',
         firstname: 'existing',
       },

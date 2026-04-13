@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 
-import { HashingService } from './infra/hashing.adapter';
-import { IHASHING_SERVICE_TOKEN } from './domain/hashing.service.interface';
+import { HashingAdapter } from './infra/hashing.adapter';
+import { HASHING_PORT_TOKEN } from './domain/hashing.port';
 
 @Module({
   providers: [
     {
-      provide: IHASHING_SERVICE_TOKEN,
-      useClass: HashingService,
+      provide: HASHING_PORT_TOKEN,
+      useClass: HashingAdapter,
     },
   ],
-  exports: [IHASHING_SERVICE_TOKEN],
+  exports: [HASHING_PORT_TOKEN],
 })
 export class HashingModule {}

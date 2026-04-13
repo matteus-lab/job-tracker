@@ -1,10 +1,10 @@
 import * as argon2 from 'argon2';
 import { createHash } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import { IHashingService } from '../domain/hashing.service.interface';
+import { HashingPort } from '../domain/hashing.port';
 
 @Injectable()
-export class HashingService implements IHashingService {
+export class HashingAdapter implements HashingPort {
   async hash(data: string): Promise<string> {
     return argon2.hash(data, {
       memoryCost: 2 ** 16,

@@ -9,7 +9,7 @@ import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';
 import { AuthResponseDto } from 'src/modules/auth/infra/dto/response/auth.response.dto';
 import { UserResponseDto } from 'src/modules/user/infra/dto/response/user.response.dto';
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 import { ISO_DATE_REGEX, UUID_V4_REGEX } from 'test/constants/regex.constants';
 import { LoginRequestDto } from 'src/modules/auth/infra/dto/request/login.request.dto';
 import {
@@ -20,7 +20,7 @@ import { UserModel } from '@generated/models';
 
 describe('Auth Module e2e', () => {
   let app: INestApplication<App>;
-  let prismaService: PrismaService;
+  let prisma: PrismaAdapter;
   let hashingService: IHashingService;
 
   let INSERTED_USER: UserModel;
@@ -36,15 +36,15 @@ describe('Auth Module e2e', () => {
 
     await app.init();
 
-    prismaService = app.get(PrismaService);
+    prisma = app.get(PrismaAdapter);
     hashingService = app.get(IHASHING_SERVICE_TOKEN);
   });
 
   beforeEach(async () => {
-    await prismaService.client.session.deleteMany();
-    await prismaService.client.user.deleteMany();
+    await prisma.client.session.deleteMany();
+    await prisma.client.user.deleteMany();
 
-    INSERTED_USER = await prismaService.client.user.create({
+    INSERTED_USER = await prisma.client.user.create({
       data: {
         email: 'already@existing.com',
         password: await hashingService.hash('Password123!'),
@@ -60,7 +60,7 @@ describe('Auth Module e2e', () => {
   });
 
   afterAll(async () => {
-    await prismaService.onModuleDestroy();
+    await prisma.onModuleDestroy();
 
     await app.close();
   });
@@ -366,7 +366,7 @@ describe('Auth Module e2e', () => {
       const loginCookie = loginResponse.get('Set-Cookie');
       expect(loginCookie).toBeDefined();
 
-      const sessionBefore = await prismaService.client.session.findFirst({
+      const sessionBefore = await prisma.client.session.findFirst({
         where: { userId: INSERTED_USER.id },
       });
       expect(sessionBefore).toBeDefined();
@@ -389,7 +389,7 @@ describe('Auth Module e2e', () => {
 
       expect(isDeleted).toBeTruthy();
 
-      const sessionAfter = await prismaService.client.session.findFirst({
+      const sessionAfter = await prisma.client.session.findFirst({
         where: { userId: INSERTED_USER.id },
       });
       expect(sessionAfter).toBeNull();

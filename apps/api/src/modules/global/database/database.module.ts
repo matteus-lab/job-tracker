@@ -1,18 +1,18 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from './infra/prisma/prisma.service';
+import { PrismaAdapter } from './infra/prisma.adapter';
 import { ITRANSACTION_MANAGER_TOKEN } from 'src/modules/global/database/domain/transaction-manager.interface';
 
 @Global()
 @Module({
   imports: [ConfigModule],
   providers: [
-    PrismaService,
+    PrismaAdapter,
     {
       provide: ITRANSACTION_MANAGER_TOKEN,
-      useExisting: PrismaService,
+      useExisting: PrismaAdapter,
     },
   ],
-  exports: [PrismaService, ITRANSACTION_MANAGER_TOKEN],
+  exports: [PrismaAdapter, ITRANSACTION_MANAGER_TOKEN],
 })
 export class DatabaseModule {}

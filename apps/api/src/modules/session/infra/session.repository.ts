@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 import { SessionEntity } from '../domain/entities/session.entity';
 import {
   ISessionRepository,
@@ -9,7 +9,7 @@ import { SessionMapper } from './session.mapper';
 
 @Injectable()
 export class SessionRepository implements ISessionRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaAdapter) {}
 
   async create(sessionDraft: SessionDraft): Promise<SessionEntity> {
     const createSessionPersistence = SessionMapper.toPersistence(sessionDraft);

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 import { AuthService } from 'src/modules/auth/engine/auth.service';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';
 import { SessionModel, UserModel } from '@generated/models';
@@ -23,7 +23,7 @@ describe('Auth module integration', () => {
   let authService: AuthService;
   let jwtService: JwtService;
   let sessionService: SessionService;
-  let prismaService: PrismaService;
+  let prisma: PrismaAdapter;
   let configService: ConfigService; // Declare ConfigService
 
   beforeAll(async () => {
@@ -34,17 +34,17 @@ describe('Auth module integration', () => {
     authService = moduleFixture.get(AuthService);
     sessionService = moduleFixture.get(SessionService);
     jwtService = moduleFixture.get(JwtService);
-    prismaService = moduleFixture.get(PrismaService);
+    prisma = moduleFixture.get(PrismaAdapter);
     configService = moduleFixture.get(ConfigService); // Get ConfigService
   });
 
   beforeEach(async () => {
-    await prismaService.client.session.deleteMany();
-    await prismaService.client.user.deleteMany();
+    await prisma.client.session.deleteMany();
+    await prisma.client.user.deleteMany();
   });
 
   afterAll(async () => {
-    await prismaService.onModuleDestroy();
+    await prisma.onModuleDestroy();
     await moduleFixture.close();
   });
 
@@ -62,15 +62,14 @@ describe('Auth module integration', () => {
       const result = await authService.register(registerCommand);
 
       // Verify user persistence in the database
-      const userInDb: UserModel | null =
-        await prismaService.client.user.findUnique({
-          where: { email: registerCommand.email },
-        });
+      const userInDb: UserModel | null = await prisma.client.user.findUnique({
+        where: { email: registerCommand.email },
+      });
       expect(userInDb).toBeDefined();
 
       // Verify session persistence in the database
       const sessionInDb: SessionModel | null =
-        await prismaService.client.session.findFirst({
+        await prisma.client.session.findFirst({
           where: {
             userId: userInDb?.id,
           },
@@ -115,7 +114,7 @@ describe('Auth module integration', () => {
         'Session creation failed',
       );
 
-      const userInDb = await prismaService.client.user.findUnique({
+      const userInDb = await prisma.client.user.findUnique({
         where: { email: registerDto.email },
       });
       expect(userInDb).toBeNull();
@@ -145,7 +144,7 @@ describe('Auth module integration', () => {
       expect(result.jwtToken).toMatch(JWT_REGEX);
       expect(result.refreshToken).toMatch(UUID_V4_REGEX);
 
-      const sessionInDb = await prismaService.client.session.findFirst({
+      const sessionInDb = await prisma.client.session.findFirst({
         where: { userId: result.user.id },
         orderBy: { createdAt: 'desc' }, // last created
       });
@@ -197,7 +196,7 @@ describe('Auth module integration', () => {
       const { refreshToken: oldRawToken, user } =
         await authService.register(registerDto);
 
-      const sessionBefore = await prismaService.client.session.findFirst({
+      const sessionBefore = await prisma.client.session.findFirst({
         where: { userId: user.id },
       });
       expect(sessionBefore).toBeDefined();
@@ -208,12 +207,12 @@ describe('Auth module integration', () => {
       expect(result.refreshToken).not.toBe(oldRawToken); // rotation
       expect(result.user.id).toBe(user.id);
 
-      const oldSession = await prismaService.client.session.findFirst({
+      const oldSession = await prisma.client.session.findFirst({
         where: { id: sessionBefore?.id },
       });
       expect(oldSession).toBeNull();
 
-      const newSession = await prismaService.client.session.findFirst({
+      const newSession = await prisma.client.session.findFirst({
         where: { userId: user.id },
       });
       expect(newSession).toBeDefined();
@@ -252,14 +251,14 @@ describe('Auth module integration', () => {
 
       const { refreshToken, user } = await authService.register(registerDto);
 
-      const sessionBefore = await prismaService.client.session.findFirst({
+      const sessionBefore = await prisma.client.session.findFirst({
         where: { userId: user.id },
       });
       expect(sessionBefore).toBeDefined();
 
       await authService.logout(refreshToken);
 
-      const sessionAfter = await prismaService.client.session.findFirst({
+      const sessionAfter = await prisma.client.session.findFirst({
         where: { userId: user.id },
       });
       expect(sessionAfter).toBeNull();

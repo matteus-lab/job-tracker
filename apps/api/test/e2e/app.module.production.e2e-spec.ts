@@ -11,12 +11,12 @@ import { configureApp } from 'src/configure-app';
 
 import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
 import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 import { getStorageToken, ThrottlerStorageService } from '@nestjs/throttler';
 
 describe('Production e2e', () => {
   let app: INestApplication<App>;
-  let prismaService: PrismaService;
+  let prisma: PrismaAdapter;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -29,12 +29,12 @@ describe('Production e2e', () => {
 
     await app.init();
 
-    prismaService = app.get(PrismaService);
+    prisma = app.get(PrismaAdapter);
   });
 
   beforeEach(async () => {
-    await prismaService.client.session.deleteMany();
-    await prismaService.client.user.deleteMany();
+    await prisma.client.session.deleteMany();
+    await prisma.client.user.deleteMany();
 
     // Reset throttler storage to ensure test isolation
     const throttlerStorage: ThrottlerStorageService =
@@ -49,7 +49,7 @@ describe('Production e2e', () => {
   });
 
   afterAll(async () => {
-    await prismaService.onModuleDestroy();
+    await prisma.onModuleDestroy();
 
     await app.close();
   });

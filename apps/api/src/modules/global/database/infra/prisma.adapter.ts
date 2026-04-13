@@ -6,7 +6,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { ITransactionManager } from 'src/modules/global/database/domain/transaction-manager.interface';
 
 @Injectable()
-export class PrismaService
+export class PrismaAdapter
   implements OnModuleInit, OnModuleDestroy, ITransactionManager
 {
   private readonly _prisma: PrismaClient;

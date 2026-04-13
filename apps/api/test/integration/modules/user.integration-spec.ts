@@ -4,7 +4,7 @@ import { UserModel } from '@generated/models';
 import { AppModule } from 'src/app.module';
 import { UUID_V4_REGEX } from 'test/constants/regex.constants';
 
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 import {
   AppBusinessException,
   ErrorCodes,
@@ -25,7 +25,7 @@ describe('User module integration', () => {
   let moduleFixture: TestingModule;
   let userService: UserService;
   let userRepository: UserRepository;
-  let prismaService: PrismaService;
+  let prisma: PrismaAdapter;
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
@@ -34,12 +34,12 @@ describe('User module integration', () => {
 
     userService = moduleFixture.get<UserService>(UserService);
     userRepository = moduleFixture.get<UserRepository>(IUSER_REPOSITORY_TOKEN);
-    prismaService = moduleFixture.get(PrismaService);
+    prisma = moduleFixture.get(PrismaAdapter);
   });
 
   beforeEach(async () => {
-    await prismaService.client.user.deleteMany();
-    INSERTED_USER = await prismaService.client.user.create({
+    await prisma.client.user.deleteMany();
+    INSERTED_USER = await prisma.client.user.create({
       data: {
         email: 'john@doe.com',
         password: 'hashed_password',
@@ -50,7 +50,7 @@ describe('User module integration', () => {
   });
 
   afterAll(async () => {
-    await prismaService.onModuleDestroy();
+    await prisma.onModuleDestroy();
     await moduleFixture.close();
   });
 
@@ -69,7 +69,7 @@ describe('User module integration', () => {
         expect(result.email).toBe(createUserCommand.email);
         expect(result).toBeInstanceOf(UserEntity);
 
-        const userInDb = await prismaService.client.user.findUnique({
+        const userInDb = await prisma.client.user.findUnique({
           where: { id: result.id },
         });
 
@@ -151,10 +151,9 @@ describe('User module integration', () => {
         expect(result.id).toBeDefined();
 
         // Verify user persistence in the database
-        const userInDb: UserModel | null =
-          await prismaService.client.user.findUnique({
-            where: { id: result.id },
-          });
+        const userInDb: UserModel | null = await prisma.client.user.findUnique({
+          where: { id: result.id },
+        });
 
         expect(userInDb).toBeDefined();
         expect(userInDb?.id).toMatch(UUID_V4_REGEX);
@@ -207,7 +206,7 @@ describe('User module integration', () => {
         const unexpectedError = new Error('Unexpected DB crash');
 
         jest
-          .spyOn(prismaService.client.user, 'create')
+          .spyOn(prisma.client.user, 'create')
           .mockRejectedValueOnce(unexpectedError);
 
         await expect(userRepository.create(userDraf)).rejects.toThrow(

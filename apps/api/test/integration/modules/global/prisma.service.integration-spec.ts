@@ -1,32 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 
-describe('PrismaService Integration', () => {
+describe('prisma Integration', () => {
   let moduleFixture: TestingModule;
-  let prismaService: PrismaService;
+  let prisma: PrismaAdapter;
 
   beforeAll(async () => {
     moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    prismaService = moduleFixture.get(PrismaService);
+    prisma = moduleFixture.get(PrismaAdapter);
   });
 
   beforeEach(async () => {
-    await prismaService.client.user.deleteMany();
+    await prisma.client.user.deleteMany();
   });
 
   afterAll(async () => {
-    await prismaService.onModuleDestroy();
+    await prisma.onModuleDestroy();
     await moduleFixture.close();
   });
 
   describe('Transaction Management (ALS)', () => {
     it('should persist data when transaction succeeds', async () => {
-      await prismaService.runInTransaction(async () => {
-        await prismaService.client.user.create({
+      await prisma.runInTransaction(async () => {
+        await prisma.client.user.create({
           data: {
             email: 'tx-success@test.com',
             password: 'hash',
@@ -36,7 +36,7 @@ describe('PrismaService Integration', () => {
         });
       });
 
-      const user = await prismaService.client.user.findUnique({
+      const user = await prisma.client.user.findUnique({
         where: { email: 'tx-success@test.com' },
       });
 
@@ -47,8 +47,8 @@ describe('PrismaService Integration', () => {
       const email = 'tx-rollback@test.com';
 
       try {
-        await prismaService.runInTransaction(async () => {
-          await prismaService.client.user.create({
+        await prisma.runInTransaction(async () => {
+          await prisma.client.user.create({
             data: {
               email,
               password: 'hash',
@@ -63,7 +63,7 @@ describe('PrismaService Integration', () => {
         // expected error
       }
 
-      const user = await prismaService.client.user.findUnique({
+      const user = await prisma.client.user.findUnique({
         where: { email },
       });
 
@@ -71,10 +71,10 @@ describe('PrismaService Integration', () => {
     });
 
     it('should return the transaction client when inside als.run', async () => {
-      await prismaService.runInTransaction(() => {
-        const client = prismaService.client;
+      await prisma.runInTransaction(() => {
+        const client = prisma.client;
 
-        expect(client).not.toBe(prismaService['_prisma']);
+        expect(client).not.toBe(prisma['_prisma']);
 
         return Promise.resolve();
       });

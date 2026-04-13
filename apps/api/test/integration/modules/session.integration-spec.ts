@@ -3,7 +3,7 @@
 import { createHash } from 'node:crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 import { SessionModel } from '@generated/models';
 
 import { SessionEntity } from 'src/modules/session/domain/entities/session.entity';
@@ -20,7 +20,7 @@ describe('Session module integration', () => {
   let moduleFixture: TestingModule;
   let sessionService: SessionService;
   let sessionRepository: SessionRepository;
-  let prismaService: PrismaService;
+  let prisma: PrismaAdapter;
 
   let alreadyInsertedUserId: string;
 
@@ -33,12 +33,12 @@ describe('Session module integration', () => {
     sessionRepository = moduleFixture.get<SessionRepository>(
       ISESSION_REPOSITORY_TOKEN,
     );
-    prismaService = moduleFixture.get(PrismaService);
+    prisma = moduleFixture.get(PrismaAdapter);
   });
 
   beforeEach(async () => {
-    await prismaService.client.session.deleteMany();
-    await prismaService.client.user.deleteMany();
+    await prisma.client.session.deleteMany();
+    await prisma.client.user.deleteMany();
 
     const userData: CreateUserPersistence = {
       email: 'john@doe.com',
@@ -47,7 +47,7 @@ describe('Session module integration', () => {
       firstname: 'John',
     };
 
-    const user = await prismaService.client.user.create({
+    const user = await prisma.client.user.create({
       data: userData,
     });
 
@@ -55,7 +55,7 @@ describe('Session module integration', () => {
   });
 
   afterAll(async () => {
-    await prismaService.onModuleDestroy();
+    await prisma.onModuleDestroy();
     await moduleFixture.close();
   });
 
@@ -74,7 +74,7 @@ describe('Session module integration', () => {
         expect(sessionEntity).toBeInstanceOf(SessionEntity);
         expect(refreshToken).toMatch(UUID_V4_REGEX);
 
-        const sessionInDb = await prismaService.client.session.findUnique({
+        const sessionInDb = await prisma.client.session.findUnique({
           where: { id: sessionEntity.id },
         });
 
@@ -101,7 +101,7 @@ describe('Session module integration', () => {
 
         expect(result).toBeInstanceOf(SessionEntity);
 
-        const inDb = await prismaService.client.session.findUnique({
+        const inDb = await prisma.client.session.findUnique({
           where: { id: sessionEntity.id },
         });
 
@@ -115,7 +115,7 @@ describe('Session module integration', () => {
           userAgent: 'Test',
         });
 
-        await prismaService.client.session.update({
+        await prisma.client.session.update({
           where: { id: sessionEntity.id },
           data: { expiresAt: new Date(Date.now() - 1000) },
         });
@@ -124,7 +124,7 @@ describe('Session module integration', () => {
 
         expect(result).toBeNull();
 
-        const inDb = await prismaService.client.session.findUnique({
+        const inDb = await prisma.client.session.findUnique({
           where: { id: sessionEntity.id },
         });
 
@@ -147,7 +147,7 @@ describe('Session module integration', () => {
 
         await sessionService.deleteByRefreshToken(refreshToken);
 
-        const sessionInDb = await prismaService.client.session.findUnique({
+        const sessionInDb = await prisma.client.session.findUnique({
           where: { id: sessionEntity.id },
         });
         expect(sessionInDb).toBeNull();
@@ -156,7 +156,7 @@ describe('Session module integration', () => {
 
     describe('expiredSessionsCleanup', () => {
       it('should clean up sessions based on real DB time', async () => {
-        await prismaService.client.session.create({
+        await prisma.client.session.create({
           data: {
             userId: alreadyInsertedUserId,
             hashedRefreshToken: 'expired',
@@ -168,7 +168,7 @@ describe('Session module integration', () => {
 
         await sessionService.expiredSessionsCleanup();
 
-        const count = await prismaService.client.session.count();
+        const count = await prisma.client.session.count();
         expect(count).toBe(0);
       });
 
@@ -242,7 +242,7 @@ describe('Session module integration', () => {
         const result = await sessionRepository.create(persistenceData);
 
         const sessionInDb: SessionModel | null =
-          await prismaService.client.session.findFirst({
+          await prisma.client.session.findFirst({
             where: {
               userId: alreadyInsertedUserId,
             },
@@ -292,7 +292,7 @@ describe('Session module integration', () => {
         await sessionRepository.create(session1);
         await sessionRepository.create(session2);
 
-        const sessionsInDb = await prismaService.client.session.findMany({
+        const sessionsInDb = await prisma.client.session.findMany({
           where: { userId: alreadyInsertedUserId },
         });
 
@@ -315,7 +315,7 @@ describe('Session module integration', () => {
         const result =
           await sessionRepository.findByHashedRefreshToken(hashedRefreshToken);
 
-        const sessionInDb = await prismaService.client.session.findFirst({
+        const sessionInDb = await prisma.client.session.findFirst({
           where: { hashedRefreshToken },
         });
 
@@ -350,7 +350,7 @@ describe('Session module integration', () => {
           hashedRefreshToken,
         );
 
-        const sessionInDb = await prismaService.client.session.findFirst({
+        const sessionInDb = await prisma.client.session.findFirst({
           where: { hashedRefreshToken },
         });
 
@@ -389,7 +389,7 @@ describe('Session module integration', () => {
         const deletedCount = await sessionRepository.deleteAllExpired();
         expect(deletedCount).toBe(1);
 
-        const sessions = await prismaService.client.session.findMany({
+        const sessions = await prisma.client.session.findMany({
           where: { userId: alreadyInsertedUserId },
         });
 

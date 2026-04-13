@@ -4,7 +4,7 @@ import {
   AppBusinessException,
 } from 'src/core/exceptions/business.exceptions';
 import { Prisma } from '@generated/client';
-import { PrismaService } from 'src/modules/global/database/infra/prisma/prisma.service';
+import { PrismaAdapter } from 'src/modules/global/database/infra/prisma.adapter';
 import { UserMapper } from './user.mapper';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
@@ -16,7 +16,7 @@ import { CreateUserPersistence } from './persistence/createUser.persistence';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaAdapter) {}
 
   async create(userDraft: UserDraft): Promise<UserEntity> {
     try {

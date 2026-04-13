@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import {
   IHASHING_SERVICE_TOKEN,
   IHashingService,
-} from 'src/modules/global/hashing/domain/hashing.service.interface';
+} from 'src/modules/hashing/domain/hashing.service.interface';
 
 import {
   IUSER_REPOSITORY_TOKEN,

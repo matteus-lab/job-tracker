@@ -17,7 +17,6 @@ import { DevController } from './dev.controller';
 
 // Global modules
 import { DatabaseModule } from './modules/global/database/database.module';
-import { HashingModule } from './modules/global/hashing/hashing.module';
 
 // App modules
 import { AuthModule } from 'src/modules/auth/auth.module';
@@ -96,7 +95,7 @@ if (process.env.NODE_ENV !== 'production') {
     }),
     // Global
     DatabaseModule,
-    HashingModule,
+
     // App
     AuthModule,
     SessionModule,

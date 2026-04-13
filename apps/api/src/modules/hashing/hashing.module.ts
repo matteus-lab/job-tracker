@@ -1,9 +1,8 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
-import { HashingService } from './infra/hashing.service';
+import { HashingService } from './infra/hashing.adapter';
 import { IHASHING_SERVICE_TOKEN } from './domain/hashing.service.interface';
 
-@Global()
 @Module({
   providers: [
     {

@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   IHASHING_SERVICE_TOKEN,
   type IHashingService,
-} from 'src/modules/global/hashing/domain/hashing.service.interface';
+} from 'src/modules/hashing/domain/hashing.service.interface';
 import { SessionEntity } from '../domain/entities/session.entity';
 import {
   ISESSION_REPOSITORY_TOKEN,

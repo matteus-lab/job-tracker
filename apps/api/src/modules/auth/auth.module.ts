@@ -6,9 +6,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from 'src/modules/user/user.module';
 import { SessionModule } from 'src/modules/session/session.module';
 import { JwtAuthGuard } from 'src/modules/auth/infra/guard/jwt-auth.guard';
+import { HashingModule } from '../hashing/hashing.module';
 
 @Module({
   imports: [
+    HashingModule,
     UserModule,
     SessionModule,
     JwtModule.registerAsync({

@@ -15,7 +15,7 @@ import { LoginRequestDto } from 'src/modules/auth/infra/dto/request/login.reques
 import {
   IHASHING_SERVICE_TOKEN,
   IHashingService,
-} from 'src/modules/global/hashing/domain/hashing.service.interface';
+} from 'src/modules/hashing/domain/hashing.service.interface';
 import { UserModel } from '@generated/models';
 
 describe('Auth Module e2e', () => {

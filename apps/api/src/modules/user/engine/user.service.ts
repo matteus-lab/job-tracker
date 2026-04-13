@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   IHASHING_SERVICE_TOKEN,
   type IHashingService,
-} from 'src/modules/global/hashing/domain/hashing.service.interface';
+} from 'src/modules/hashing/domain/hashing.service.interface';
 import { UserEntity } from '../domain/entities/user.entity';
 import { UserWithPasswordEntity } from '../domain/entities/userWithPassword.entity';
 import {

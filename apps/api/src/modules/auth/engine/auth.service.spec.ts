@@ -8,7 +8,7 @@ import { AuthResult, AuthService } from './auth.service';
 import {
   IHASHING_SERVICE_TOKEN,
   IHashingService,
-} from 'src/modules/global/hashing/domain/hashing.service.interface';
+} from 'src/modules/hashing/domain/hashing.service.interface';
 import { UserService } from 'src/modules/user/engine/user.service';
 import { SessionService } from 'src/modules/session/engine/session.service';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';

@@ -14,7 +14,7 @@ import {
 import {
   IHASHING_SERVICE_TOKEN,
   type IHashingService,
-} from 'src/modules/global/hashing/domain/hashing.service.interface';
+} from 'src/modules/hashing/domain/hashing.service.interface';
 
 import { JwtPayload } from 'src/modules/auth/domain/types/jwt-payload.interface';
 

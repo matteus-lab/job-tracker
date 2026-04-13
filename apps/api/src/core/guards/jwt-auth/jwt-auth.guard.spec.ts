@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from 'src/core/guards/jwt-auth/jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { ExecutionContext, HttpStatus } from '@nestjs/common';
@@ -7,7 +7,7 @@ import {
   AppBusinessException,
   ErrorCodes,
 } from 'src/core/exceptions/business.exceptions';
-import { JwtPayload } from '../../domain/types/jwt-payload.interface';
+import { JwtPayload } from 'src/core/types/jwt-payload.interface';
 import { Request } from 'express';
 
 describe('jwtAuthGuard', () => {

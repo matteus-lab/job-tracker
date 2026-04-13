@@ -5,9 +5,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { JwtModule } from '@nestjs/jwt';
 
 // Filters
 import { AllExceptionsFilter } from './core/exceptions/all-exceptions.filter';
+
+// Guards
+import { JwtAuthGuard } from 'src/core/guards/jwt-auth/jwt-auth.guard';
 
 // App controller
 import { AppController } from './app.controller';
@@ -19,7 +23,6 @@ import { DevController } from './dev.controller';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { SessionModule } from 'src/modules/session/session.module';
 import { UserModule } from 'src/modules/user/user.module';
-import { JwtAuthGuard } from 'src/modules/auth/infra/guard/jwt-auth.guard';
 
 const controllers: any[] = [AppController];
 
@@ -31,6 +34,20 @@ if (process.env.NODE_ENV !== 'production') {
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    JwtModule.registerAsync({
+      global: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get(
+            'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+            '15m',
+          ),
+        },
+      }),
+    }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -97,6 +114,7 @@ if (process.env.NODE_ENV !== 'production') {
   ],
   controllers: controllers,
   providers: [
+    JwtModule,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

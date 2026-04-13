@@ -14,7 +14,7 @@ import {
   ErrorCodes,
 } from 'src/core/exceptions/business.exceptions';
 import { HttpStatus } from '@nestjs/common';
-import { JwtPayload } from 'src/modules/auth/domain/types/jwt-payload.interface';
+import { JwtPayload } from 'src/core/types/jwt-payload.interface';
 import { RegisterCommand } from 'src/modules/auth/engine/commands/register.command';
 import { LoginCommand } from 'src/modules/auth/engine/commands/login.command';
 

@@ -11,7 +11,7 @@ import {
   AppBusinessException,
   ErrorCodes,
 } from 'src/core/exceptions/business.exceptions';
-import { JwtPayload } from '../../domain/types/jwt-payload.interface';
+import { JwtPayload } from 'src/core/types/jwt-payload.interface';
 import { Request } from 'express';
 
 @Injectable()

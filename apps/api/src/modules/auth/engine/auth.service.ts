@@ -16,7 +16,7 @@ import {
   type HashingPort,
 } from 'src/modules/hashing/domain/hashing.port';
 
-import { JwtPayload } from 'src/modules/auth/domain/types/jwt-payload.interface';
+import { JwtPayload } from 'src/core/types/jwt-payload.interface';
 
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
 import { UserService } from 'src/modules/user/engine/user.service';

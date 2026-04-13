@@ -9,7 +9,7 @@ import { configureApp } from 'src/configure-app';
 import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
 import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from 'src/modules/auth/domain/types/jwt-payload.interface';
+import { JwtPayload } from 'src/core/types/jwt-payload.interface';
 
 describe('App module e2e', () => {
   let app: INestApplication<App>;
@@ -77,7 +77,7 @@ describe('App module e2e', () => {
       const url = '/api/v1/dev/test-non-public-route';
 
       const expiredToken = jwtService.sign<JwtPayload>(
-        { sub: 'user-uuid' },
+        { sub: 'user-uuid', email: 'email@domain.com' },
         { expiresIn: '-10s' },
       );
 
@@ -99,7 +99,7 @@ describe('App module e2e', () => {
       const url = '/api/v1/dev/test-non-public-route';
 
       const validToken = jwtService.sign<JwtPayload>(
-        { sub: 'user-uuid' },
+        { sub: 'user-uuid', email: 'email@domain.com' },
         { expiresIn: '7w' },
       );
 

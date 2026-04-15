@@ -19,11 +19,11 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 import {
-  AppBusinessException,
   ErrorCodes,
-} from 'src/core/exceptions/business.exceptions';
-import { Public } from 'src/core/decorators/public.decorator';
-import { Cookies } from 'src/core/decorators/cookies.decorator';
+  BusinessError,
+} from 'src/core/domain/errors/business.error';
+import { Public } from 'src/core/infra/decorators/public.decorator';
+import { Cookies } from 'src/core/infra/decorators/cookies.decorator';
 import { AuthService } from '../application/auth.service';
 import { AuthMapper } from './auth.mapper';
 import { AuthResponseDto } from 'src/modules/auth/infra/dto/response/auth.response.dto';
@@ -136,13 +136,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     if (!refreshToken) {
-      throw new AppBusinessException(
-        {
-          errorCode: ErrorCodes.UNAUTHORIZED,
-          messages: ['Unauthorized refresh action'],
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new BusinessError({
+        errorCode: ErrorCodes.UNAUTHORIZED,
+        messages: ['Unauthorized refresh action'],
+      });
     }
 
     const authResult = await this.authService.refresh(refreshToken);

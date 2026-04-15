@@ -8,10 +8,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule } from '@nestjs/jwt';
 
 // Filters
-import { AllExceptionsFilter } from './core/exceptions/all-exceptions.filter';
+import { AllExceptionsFilter } from 'src/core/infra/filters/exceptions/all-exceptions.filter';
 
 // Guards
-import { JwtAuthGuard } from 'src/core/guards/jwt-auth/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/core/infra/guards/jwt-auth/jwt-auth.guard';
 
 // App controller
 import { AppController } from './app.controller';

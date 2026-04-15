@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 import { Expose } from 'class-transformer';
-import { Public } from 'src/core/decorators/public.decorator';
+import { Public } from 'src/core/infra/decorators/public.decorator';
 
 class HealthResponseDto {
   @Expose()

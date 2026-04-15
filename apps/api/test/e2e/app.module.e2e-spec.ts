@@ -6,10 +6,10 @@ import { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
 import { configureApp } from 'src/configure-app';
 
-import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
-import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
+import { ErrorResponse } from 'src/core/infra/filters/exceptions/all-exceptions.types';
+import { ErrorCodes } from 'src/core/domain/errors/business.error';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from 'src/core/types/jwt-payload.interface';
+import { JwtPayload } from 'src/core/infra/interfaces/jwt-payload.interface';
 
 describe('App module e2e', () => {
   let app: INestApplication<App>;
@@ -47,7 +47,7 @@ describe('App module e2e', () => {
         .get(url)
         .expect(HttpStatus.UNAUTHORIZED);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toMatchObject({
         statusCode: HttpStatus.UNAUTHORIZED,
@@ -64,7 +64,7 @@ describe('App module e2e', () => {
         .set('Authorization', 'Bearer invalid-token-123')
         .expect(HttpStatus.UNAUTHORIZED);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toMatchObject({
         statusCode: HttpStatus.UNAUTHORIZED,
@@ -86,7 +86,7 @@ describe('App module e2e', () => {
         .set('Authorization', `Bearer ${expiredToken}`)
         .expect(HttpStatus.UNAUTHORIZED);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toMatchObject({
         statusCode: HttpStatus.UNAUTHORIZED,

@@ -10,11 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import { JWT_REGEX, UUID_V4_REGEX } from 'test/constants/regex.constants';
 import { LoginRequestDto } from 'src/modules/auth/infra/dto/request/login.request.dto';
 import {
-  AppBusinessException,
   ErrorCodes,
-} from 'src/core/exceptions/business.exceptions';
-import { HttpStatus } from '@nestjs/common';
-import { JwtPayload } from 'src/core/types/jwt-payload.interface';
+  BusinessError,
+} from 'src/core/domain/errors/business.error';
+import { JwtPayload } from 'src/core/infra/interfaces/jwt-payload.interface';
 import { RegisterCommand } from 'src/modules/auth/application/commands/register.command';
 import { LoginCommand } from 'src/modules/auth/application/commands/login.command';
 
@@ -161,9 +160,7 @@ describe('Auth module integration', () => {
         password: 'Password123!',
       };
 
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        AppBusinessException,
-      );
+      await expect(authService.login(loginDto)).rejects.toThrow(BusinessError);
     });
 
     it('should throw UNAUTHORIZED if password is incorrect', async () => {
@@ -180,9 +177,7 @@ describe('Auth module integration', () => {
         password: 'WrongP@ss123',
       };
 
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        AppBusinessException,
-      );
+      await expect(authService.login(loginDto)).rejects.toThrow(BusinessError);
     });
   });
 
@@ -225,19 +220,17 @@ describe('Auth module integration', () => {
       try {
         await authService.refresh(invalidToken);
       } catch (error) {
-        expect(error).toBeInstanceOf(AppBusinessException);
+        expect(error).toBeInstanceOf(BusinessError);
 
-        const businessError = error as AppBusinessException;
-        const status = businessError.getStatus();
-        const response = businessError.getResponse();
-
-        expect(status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(response).toEqual({
-          errorCode: ErrorCodes.NOT_FOUND,
-          messages: [
-            'No session related to the given refresh token has been found',
-          ],
-        });
+        const businessError = error as BusinessError;
+        expect(businessError).toEqual(
+          expect.objectContaining({
+            errorCode: ErrorCodes.NOT_FOUND,
+            messages: [
+              'No session related to the given refresh token has been found',
+            ],
+          }),
+        );
       }
     });
   });

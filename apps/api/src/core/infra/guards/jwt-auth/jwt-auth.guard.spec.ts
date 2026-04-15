@@ -1,14 +1,14 @@
+import { Request } from 'express';
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtAuthGuard } from 'src/core/guards/jwt-auth/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/core/infra/guards/jwt-auth/jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
-import { ExecutionContext, HttpStatus } from '@nestjs/common';
+import { ExecutionContext } from '@nestjs/common';
 import {
-  AppBusinessException,
   ErrorCodes,
-} from 'src/core/exceptions/business.exceptions';
-import { JwtPayload } from 'src/core/types/jwt-payload.interface';
-import { Request } from 'express';
+  BusinessError,
+} from 'src/core/domain/errors/business.error';
+import { JwtPayload } from 'src/core/infra/interfaces/jwt-payload.interface';
 
 describe('jwtAuthGuard', () => {
   let jwtAuthGuard: JwtAuthGuard;
@@ -67,11 +67,13 @@ describe('jwtAuthGuard', () => {
       try {
         await jwtAuthGuard.canActivate(mockContext(req));
       } catch (e) {
-        const err = e as AppBusinessException;
-        expect(err.getStatus()).toBe(HttpStatus.UNAUTHORIZED);
-        expect(err.getResponse()).toMatchObject({
-          errorCode: ErrorCodes.AUTH_TOKEN_MISSING,
-        });
+        const err = e as BusinessError;
+        expect(err).toEqual(
+          expect.objectContaining({
+            errorCode: ErrorCodes.AUTH_TOKEN_MISSING,
+            messages: ['Token missing'],
+          }),
+        );
       }
     });
 
@@ -87,11 +89,13 @@ describe('jwtAuthGuard', () => {
       try {
         await jwtAuthGuard.canActivate(mockContext(req));
       } catch (e) {
-        const err = e as AppBusinessException;
-        expect(err.getStatus()).toBe(HttpStatus.UNAUTHORIZED);
-        expect(err.getResponse()).toMatchObject({
-          errorCode: ErrorCodes.AUTH_TOKEN_EXPIRED,
-        });
+        const err = e as BusinessError;
+        expect(err).toEqual(
+          expect.objectContaining({
+            errorCode: ErrorCodes.AUTH_TOKEN_EXPIRED,
+            messages: ['Token has expired'],
+          }),
+        );
       }
     });
 
@@ -106,11 +110,13 @@ describe('jwtAuthGuard', () => {
       try {
         await jwtAuthGuard.canActivate(mockContext(req));
       } catch (e) {
-        const err = e as AppBusinessException;
-        expect(err.getStatus()).toBe(HttpStatus.UNAUTHORIZED);
-        expect(err.getResponse()).toMatchObject({
-          errorCode: ErrorCodes.AUTH_TOKEN_INVALID,
-        });
+        const err = e as BusinessError;
+        expect(err).toEqual(
+          expect.objectContaining({
+            errorCode: ErrorCodes.AUTH_TOKEN_INVALID,
+            messages: ['Invalid token'],
+          }),
+        );
       }
     });
 

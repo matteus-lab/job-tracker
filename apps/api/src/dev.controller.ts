@@ -5,16 +5,15 @@ import {
   Controller,
   Get,
   Post,
-  HttpStatus,
 } from '@nestjs/common';
 
 import { IsNumberString, IsString } from 'class-validator';
 import { Exclude, Expose } from 'class-transformer';
-import { Public } from 'src/core/decorators/public.decorator';
+import { Public } from 'src/core/infra/decorators/public.decorator';
 import {
-  AppBusinessException,
   ErrorCodes,
-} from './core/exceptions/business.exceptions';
+  BusinessError,
+} from 'src/core/domain/errors/business.error';
 
 class TestBodyDto {
   @IsString()
@@ -58,13 +57,10 @@ export class DevController {
   @Public()
   @Get('trigger-business-error')
   triggerErrorBusiness() {
-    throw new AppBusinessException(
-      {
-        errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
-        messages: ['Email already used'],
-      },
-      HttpStatus.CONFLICT,
-    );
+    throw new BusinessError({
+      errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
+      messages: ['Email already used'],
+    });
   }
 
   @Public()

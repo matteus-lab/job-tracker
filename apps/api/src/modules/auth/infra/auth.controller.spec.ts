@@ -11,7 +11,7 @@ import { SessionEntity } from 'src/modules/session/domain/entities/session.entit
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { AuthResponseDto } from 'src/modules/auth/infra/dto/response/auth.response.dto';
 import { LoginRequestDto } from 'src/modules/auth/infra/dto/request/login.request.dto';
-import { AppBusinessException } from 'src/core/exceptions/business.exceptions';
+import { BusinessError } from 'src/core/domain/errors/business.error';
 
 const MOCK_RES = {
   cookie: jest.fn(),
@@ -167,7 +167,7 @@ describe('AuthController', () => {
 
     it('should throw AppBusinessException if cookie is missing', async () => {
       await expect(authController.refresh(undefined, MOCK_RES)).rejects.toThrow(
-        AppBusinessException,
+        BusinessError,
       );
       expect(authService.refresh).not.toHaveBeenCalled();
     });

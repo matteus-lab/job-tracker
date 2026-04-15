@@ -1,10 +1,10 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import {
-  AppBusinessException,
+  BusinessError,
   ErrorCodes,
-} from 'src/core/exceptions/business.exceptions';
+} from 'src/core/domain/errors/business.error';
 
 import {
   PERSISTENCE_PORT_TOKEN,
@@ -16,7 +16,7 @@ import {
   type HashingPort,
 } from 'src/modules/hashing/domain/hashing.port';
 
-import { JwtPayload } from 'src/core/types/jwt-payload.interface';
+import { JwtPayload } from 'src/core/infra/interfaces/jwt-payload.interface';
 
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
 import { UserService } from 'src/modules/user/application/user.service';
@@ -80,14 +80,11 @@ export class AuthService {
   }
 
   async login(command: LoginCommand): Promise<AuthResult> {
-    const invalidCredentialError = new AppBusinessException(
-      {
-        errorCode: ErrorCodes.AUTH_INVALID_CREDENTIALS,
-        messages: ['Invalid credentials'],
-        targetFields: ['email', 'password'],
-      },
-      HttpStatus.UNAUTHORIZED,
-    );
+    const invalidCredentialError = new BusinessError({
+      errorCode: ErrorCodes.AUTH_INVALID_CREDENTIALS,
+      messages: ['Invalid credentials'],
+      targetFields: ['email', 'password'],
+    });
 
     const userWithPasswordEntity: UserWithPasswordEntity | null =
       await this.userService.getByEmailWithPassword(command.email);
@@ -126,29 +123,21 @@ export class AuthService {
     const session = await this.sessionService.validateSession(oldRefreshToken);
 
     if (!session) {
-      throw new AppBusinessException(
-        {
-          errorCode: ErrorCodes.NOT_FOUND,
-          messages: [
-            'No session related to the given refresh token has been found',
-          ],
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new BusinessError({
+        errorCode: ErrorCodes.NOT_FOUND,
+        messages: [
+          'No session related to the given refresh token has been found',
+        ],
+      });
     }
 
     const userEntity = await this.userService.getById(session.userId);
 
     if (!userEntity) {
-      throw new AppBusinessException(
-        {
-          errorCode: ErrorCodes.NOT_FOUND,
-          messages: [
-            'No user related to the given refresh token has been found',
-          ],
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new BusinessError({
+        errorCode: ErrorCodes.NOT_FOUND,
+        messages: ['No user related to the given refresh token has been found'],
+      });
     }
 
     await this.sessionService.deleteByRefreshToken(oldRefreshToken);

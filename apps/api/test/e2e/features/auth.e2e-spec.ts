@@ -4,8 +4,8 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
 import { configureApp } from 'src/configure-app';
-import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
-import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
+import { ErrorResponse } from 'src/core/infra/filters/exceptions/all-exceptions.types';
+import { ErrorCodes } from 'src/core/domain/errors/business.error';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';
 import { AuthResponseDto } from 'src/modules/auth/infra/dto/response/auth.response.dto';
 import { UserResponseDto } from 'src/modules/user/infra/dto/response/user.response.dto';
@@ -131,7 +131,7 @@ describe('Auth Module e2e', () => {
             .send(payload)
             .expect(HttpStatus.CONFLICT);
 
-          const body = response.body as ExceptionResponse;
+          const body = response.body as ErrorResponse;
 
           expect(body.statusCode).toBe(HttpStatus.CONFLICT);
           expect(body.errorCode).toBe(ErrorCodes.USER_EMAIL_ALREADY_EXISTS);
@@ -148,7 +148,7 @@ describe('Auth Module e2e', () => {
             })
             .expect(HttpStatus.BAD_REQUEST);
 
-          const body = response.body as ExceptionResponse;
+          const body = response.body as ErrorResponse;
           expect(body.messages).toEqual(['email must be an email']);
         });
 
@@ -158,7 +158,7 @@ describe('Auth Module e2e', () => {
             .send({ password: 'Password123!' })
             .expect(HttpStatus.BAD_REQUEST);
 
-          const body = response.body as ExceptionResponse;
+          const body = response.body as ErrorResponse;
           expect(body.messages).toEqual(['email must be an email']);
         });
       });
@@ -170,7 +170,7 @@ describe('Auth Module e2e', () => {
           { password: 'PasswordTest!', reason: 'missing number' },
           { password: 'Password1234', reason: 'missing special character' },
           { password: 'Pa1!', reason: 'below 8 characters' },
-          { password: '', reason: 'is empty' },
+          { password: '', reason: 'empty' },
         ])(
           'should fail with 400 if password is $reason',
           async ({ password }) => {
@@ -182,7 +182,7 @@ describe('Auth Module e2e', () => {
               })
               .expect(HttpStatus.BAD_REQUEST);
 
-            const body = response.body as ExceptionResponse;
+            const body = response.body as ErrorResponse;
 
             expect(body.messages).toEqual(['password is not strong enough']);
           },
@@ -253,7 +253,7 @@ describe('Auth Module e2e', () => {
           .send(loginDto)
           .expect(HttpStatus.UNAUTHORIZED);
 
-        const body = response.body as ExceptionResponse;
+        const body = response.body as ErrorResponse;
         expect(body.statusCode).toBe(HttpStatus.UNAUTHORIZED);
         expect(body.errorCode).toBe(ErrorCodes.AUTH_INVALID_CREDENTIALS);
         expect(body.messages).toEqual(['Invalid credentials']);
@@ -271,7 +271,7 @@ describe('Auth Module e2e', () => {
           .send(loginDto)
           .expect(HttpStatus.UNAUTHORIZED);
 
-        const body = loginResponse.body as ExceptionResponse;
+        const body = loginResponse.body as ErrorResponse;
         expect(body.statusCode).toBe(HttpStatus.UNAUTHORIZED);
         expect(body.errorCode).toBe(ErrorCodes.AUTH_INVALID_CREDENTIALS);
         expect(body.messages).toEqual(['Invalid credentials']);
@@ -343,7 +343,7 @@ describe('Auth Module e2e', () => {
         .post(route)
         .expect(HttpStatus.UNAUTHORIZED);
 
-      const body = refreshResponse.body as ExceptionResponse;
+      const body = refreshResponse.body as ErrorResponse;
       expect(body.statusCode).toBe(HttpStatus.UNAUTHORIZED);
       expect(body.errorCode).toBe(ErrorCodes.UNAUTHORIZED);
       expect(body.messages).toEqual(['Unauthorized refresh action']);

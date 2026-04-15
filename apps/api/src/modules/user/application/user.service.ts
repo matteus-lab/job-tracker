@@ -54,7 +54,7 @@ export class UserService {
   }
 
   /*
-   *  We do not throw an AppBusinessException if the user doesn't exist
+   *  We do not throw a BusinessError if the user doesn't exist
    *  to avoid enumeration attack
    */
   async getByEmailWithPassword(

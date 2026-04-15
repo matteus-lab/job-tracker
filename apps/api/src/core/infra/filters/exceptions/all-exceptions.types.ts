@@ -1,24 +1,10 @@
 import { ReqId } from 'pino-http';
-import { BusinessError } from './business.exceptions';
+import { BusinessErrorJson } from 'src/core/domain/errors/business.error';
 
 export interface NestError {
   statusCode: number;
   message: string | string[];
   error: string;
-}
-
-export interface ExpressError {
-  statusCode: number;
-  name?: string;
-  message?: string;
-}
-
-export interface ExceptionResponse extends BusinessError {
-  requestId: ReqId;
-  method: string;
-  url: string;
-  timestamp: string;
-  statusCode: number;
 }
 
 export function isNestError(err: unknown): err is NestError {
@@ -34,6 +20,12 @@ export function isNestError(err: unknown): err is NestError {
   );
 }
 
+export interface ExpressError {
+  statusCode: number;
+  name?: string;
+  message?: string;
+}
+
 export function isExpressError(err: unknown): err is ExpressError {
   return (
     typeof err === 'object' &&
@@ -41,4 +33,12 @@ export function isExpressError(err: unknown): err is ExpressError {
     'statusCode' in err &&
     typeof (err as Record<string, unknown>).statusCode === 'number'
   );
+}
+
+export interface ErrorResponse extends BusinessErrorJson {
+  requestId: ReqId;
+  method: string;
+  url: string;
+  timestamp: string;
+  statusCode: number;
 }

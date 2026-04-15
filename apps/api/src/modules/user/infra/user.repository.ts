@@ -1,8 +1,8 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   ErrorCodes,
-  AppBusinessException,
-} from 'src/core/exceptions/business.exceptions';
+  BusinessError,
+} from 'src/core/domain/errors/business.error';
 import { Prisma, PrismaClient } from '@generated/client';
 import { UserMapper } from './user.mapper';
 import { UserEntity } from '../domain/entities/user.entity';
@@ -36,14 +36,11 @@ export class UserRepository implements UserRepositoryPort {
           e.code === 'P2002' && // P2002 is a unique constraint violation
           e.message.includes('email')
         )
-          throw new AppBusinessException(
-            {
-              errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
-              messages: ['This email is already registered'],
-              targetFields: ['email'],
-            },
-            HttpStatus.CONFLICT,
-          );
+          throw new BusinessError({
+            errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
+            messages: ['This email is already registered'],
+            targetFields: ['email'],
+          });
       }
       throw e;
     }

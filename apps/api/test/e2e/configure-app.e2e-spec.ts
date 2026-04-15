@@ -6,8 +6,8 @@ import { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
 
 import { configureApp } from 'src/configure-app';
-import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
-import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
+import { ErrorResponse } from 'src/core/infra/filters/exceptions/all-exceptions.types';
+import { ErrorCodes } from 'src/core/domain/errors/business.error';
 import { ConfigService } from '@nestjs/config';
 
 describe('configure-app e2e', () => {
@@ -188,7 +188,7 @@ describe('configure-app e2e', () => {
         })
         .expect(HttpStatus.BAD_REQUEST);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -207,7 +207,7 @@ describe('configure-app e2e', () => {
         .query({ age: 'not-a-number' })
         .expect(HttpStatus.BAD_REQUEST);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,

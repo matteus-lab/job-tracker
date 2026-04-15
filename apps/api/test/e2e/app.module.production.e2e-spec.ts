@@ -9,8 +9,8 @@ import { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
 import { configureApp } from 'src/configure-app';
 
-import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
-import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
+import { ErrorCodes } from 'src/core/domain/errors/business.error';
+import { ErrorResponse } from 'src/core/infra/filters/exceptions/all-exceptions.types';
 import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 import { getStorageToken, ThrottlerStorageService } from '@nestjs/throttler';
 
@@ -64,7 +64,7 @@ describe('Production e2e', () => {
         .get('/api/v1/health')
         .expect(HttpStatus.TOO_MANY_REQUESTS);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -84,7 +84,7 @@ describe('Production e2e', () => {
         .get('/api/v1/dev/test-serialization')
         .expect(HttpStatus.NOT_FOUND);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body.messages).toContain(
         'Cannot GET /api/v1/dev/test-serialization',

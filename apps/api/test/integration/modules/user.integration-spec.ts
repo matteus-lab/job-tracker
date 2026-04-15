@@ -1,14 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus } from '@nestjs/common';
 import { UserModel } from '@generated/models';
 import { AppModule } from 'src/app.module';
 import { UUID_V4_REGEX } from 'test/constants/regex.constants';
 
 import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
 import {
-  AppBusinessException,
   ErrorCodes,
-} from 'src/core/exceptions/business.exceptions';
+  BusinessError,
+} from 'src/core/domain/errors/business.error';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
 import { USER_REPOSITORY_PORT_TOKEN } from 'src/modules/user/domain/user.repository.port';
@@ -87,18 +86,17 @@ describe('User module integration', () => {
         };
 
         await expect(userService.create(createUserCommand)).rejects.toThrow(
-          AppBusinessException,
+          BusinessError,
         );
 
         try {
           await userService.create(createUserCommand);
           fail('service.create should trigger a conflict exception');
         } catch (error) {
-          expect(error).toBeInstanceOf(AppBusinessException);
+          expect(error).toBeInstanceOf(BusinessError);
 
-          const businessError = error as AppBusinessException;
-          expect(businessError.getStatus()).toBe(HttpStatus.CONFLICT);
-          expect(businessError.getResponse()).toMatchObject({
+          const businessError = error as BusinessError;
+          expect(businessError).toMatchObject({
             errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
             messages: ['This email is already registered'],
             targetFields: ['email'],
@@ -187,18 +185,16 @@ describe('User module integration', () => {
           });
           fail('repository.create should trigger a conflict error on conflict');
         } catch (error) {
-          expect(error).toBeInstanceOf(AppBusinessException);
+          expect(error).toBeInstanceOf(BusinessError);
 
-          const businessError = error as AppBusinessException;
-          const status = businessError.getStatus();
-          const response = businessError.getResponse();
-
-          expect(status).toBe(HttpStatus.CONFLICT);
-          expect(response).toEqual({
-            errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
-            messages: ['This email is already registered'],
-            targetFields: ['email'],
-          });
+          const businessError = error as BusinessError;
+          expect(businessError).toEqual(
+            expect.objectContaining({
+              errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
+              messages: ['This email is already registered'],
+              targetFields: ['email'],
+            }),
+          );
         }
       });
 

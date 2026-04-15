@@ -7,8 +7,8 @@ import { App } from 'supertest/types';
 import { AppModule } from 'src/app.module';
 
 import { configureApp } from 'src/configure-app';
-import { ExceptionResponse } from 'src/core/exceptions/all-exceptions.filter';
-import { ErrorCodes } from 'src/core/exceptions/business.exceptions';
+import { ErrorResponse } from 'src/core/infra/filters/exceptions/all-exceptions.types';
+import { ErrorCodes } from 'src/core/domain/errors/business.error';
 
 describe('AllExceptionsFilter e2e', () => {
   let app: INestApplication<App>;
@@ -43,7 +43,7 @@ describe('AllExceptionsFilter e2e', () => {
         .set('x-request-id', customId)
         .expect(HttpStatus.NOT_FOUND);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body.requestId).toBe(customId);
     });
@@ -53,7 +53,7 @@ describe('AllExceptionsFilter e2e', () => {
         .get('/api/v1/unknown-path')
         .expect(HttpStatus.NOT_FOUND);
 
-      const body = errorResponse.body as ExceptionResponse;
+      const body = errorResponse.body as ErrorResponse;
 
       expect(body.requestId).toBeDefined();
       expect(typeof body.requestId).toBe('string');
@@ -67,7 +67,7 @@ describe('AllExceptionsFilter e2e', () => {
         .get('/api/v1/dev/trigger-business-error')
         .expect(HttpStatus.CONFLICT);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -88,7 +88,7 @@ describe('AllExceptionsFilter e2e', () => {
         .send({ name: largeData })
         .expect(HttpStatus.PAYLOAD_TOO_LARGE);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -106,7 +106,7 @@ describe('AllExceptionsFilter e2e', () => {
         .get('/api/v1/dev/non-existent-route')
         .expect(HttpStatus.NOT_FOUND);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -124,7 +124,7 @@ describe('AllExceptionsFilter e2e', () => {
         .get('/api/v1/dev/trigger-nest-error-400')
         .expect(HttpStatus.BAD_REQUEST);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -144,7 +144,7 @@ describe('AllExceptionsFilter e2e', () => {
         .send('{"name": "broken-json", }')
         .expect(HttpStatus.BAD_REQUEST);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -162,7 +162,7 @@ describe('AllExceptionsFilter e2e', () => {
         .get('/api/v1/dev/trigger-express-error')
         .expect(HttpStatus.BAD_REQUEST);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -170,7 +170,7 @@ describe('AllExceptionsFilter e2e', () => {
         url: '/api/v1/dev/trigger-express-error',
         timestamp: expect.any(String) as string,
         statusCode: HttpStatus.BAD_REQUEST,
-        errorCode: ErrorCodes.EXPRESS_ERROR,
+        errorCode: ErrorCodes.BAD_REQUEST,
         messages: ['Technical error'],
       });
     });
@@ -180,7 +180,7 @@ describe('AllExceptionsFilter e2e', () => {
         .get('/api/v1/dev/trigger-express-error-no-message')
         .expect(HttpStatus.BAD_REQUEST);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(body).toEqual({
         requestId: expect.any(String) as string,
@@ -188,9 +188,9 @@ describe('AllExceptionsFilter e2e', () => {
         url: '/api/v1/dev/trigger-express-error-no-message',
         timestamp: expect.any(String) as string,
         statusCode: HttpStatus.BAD_REQUEST,
-        errorCode: ErrorCodes.EXPRESS_ERROR,
+        errorCode: ErrorCodes.BAD_REQUEST,
         messages: [
-          'An error occured at the technical level. Please contact support with the requestId.',
+          'Infrastructure error occurred. Please contact support with the requestID.',
         ],
       });
     });
@@ -202,7 +202,7 @@ describe('AllExceptionsFilter e2e', () => {
         .get('/api/v1/dev/trigger-error-500')
         .expect(HttpStatus.INTERNAL_SERVER_ERROR);
 
-      const body = response.body as ExceptionResponse;
+      const body = response.body as ErrorResponse;
 
       expect(loggerSpy).toHaveBeenCalledWith(
         expect.objectContaining({

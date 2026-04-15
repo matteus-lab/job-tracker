@@ -2,7 +2,6 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { HttpStatus } from '@nestjs/common';
 
 import { AuthResult, AuthService } from './auth.service';
 import {
@@ -16,9 +15,9 @@ import { SessionEntity } from 'src/modules/session/domain/entities/session.entit
 import { PERSISTENCE_PORT_TOKEN } from 'src/modules/persistence/domain/persistence.port';
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
 import {
-  AppBusinessException,
   ErrorCodes,
-} from 'src/core/exceptions/business.exceptions';
+  BusinessError,
+} from 'src/core/domain/errors/business.error';
 
 import { RegisterCommand } from './commands/register.command';
 import { LoginCommand } from './commands/login.command';
@@ -214,11 +213,9 @@ describe('AuthService', () => {
 
       const act = authService.login(loginCommand);
 
-      await expect(act).rejects.toThrow(AppBusinessException);
+      await expect(act).rejects.toThrow(BusinessError);
       await expect(act).rejects.toMatchObject({
-        response: {
-          errorCode: ErrorCodes.AUTH_INVALID_CREDENTIALS,
-        },
+        errorCode: ErrorCodes.AUTH_INVALID_CREDENTIALS,
       });
     });
 
@@ -230,11 +227,9 @@ describe('AuthService', () => {
 
       const act = authService.login(loginCommand);
 
-      await expect(act).rejects.toThrow(AppBusinessException);
+      await expect(act).rejects.toThrow(BusinessError);
       await expect(act).rejects.toMatchObject({
-        response: {
-          errorCode: ErrorCodes.AUTH_INVALID_CREDENTIALS,
-        },
+        errorCode: ErrorCodes.AUTH_INVALID_CREDENTIALS,
       });
     });
   });
@@ -357,19 +352,18 @@ describe('AuthService', () => {
         await authService.refresh('wrong-token');
         fail('service.refresh should trigger an error on wrong token');
       } catch (error) {
-        expect(error).toBeInstanceOf(AppBusinessException);
+        expect(error).toBeInstanceOf(BusinessError);
 
-        const businessError = error as AppBusinessException;
-        const status = businessError.getStatus();
-        const response = businessError.getResponse();
+        const businessError = error as BusinessError;
 
-        expect(status).toBe(HttpStatus.UNAUTHORIZED);
-        expect(response).toEqual({
-          errorCode: ErrorCodes.NOT_FOUND,
-          messages: [
-            'No session related to the given refresh token has been found',
-          ],
-        });
+        expect(businessError).toEqual(
+          expect.objectContaining({
+            errorCode: ErrorCodes.NOT_FOUND,
+            messages: [
+              'No session related to the given refresh token has been found',
+            ],
+          }),
+        );
       }
     });
   });

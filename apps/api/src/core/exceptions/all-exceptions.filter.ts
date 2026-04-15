@@ -1,4 +1,5 @@
-// src/common/filters/all-exceptions.filter.ts
+import { Request } from 'express';
+import { HttpAdapterHost } from '@nestjs/core';
 import {
   Catch,
   ExceptionFilter,
@@ -6,62 +7,18 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-
-import { Request } from 'express';
-
-// Injected dependencies
-import { HttpAdapterHost } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 
 import {
-  BusinessError,
   type ErrorCode,
   ErrorCodes,
   isBusinessError,
 } from './business.exceptions';
-import { ReqId } from 'pino-http';
-
-interface NestError {
-  statusCode: number;
-  message: string | string[];
-  error: string;
-}
-
-interface ExpressError {
-  statusCode: number;
-  name?: string;
-  message?: string;
-}
-
-export interface ExceptionResponse extends BusinessError {
-  requestId: ReqId;
-  method: string;
-  url: string;
-  timestamp: string;
-  statusCode: number;
-}
-
-function isNestError(err: unknown): err is NestError {
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    'statusCode' in err &&
-    typeof (err as Record<string, unknown>).statusCode === 'number' &&
-    'error' in err &&
-    typeof err.error === 'string' &&
-    'message' in err &&
-    (typeof err.message === 'string' || Array.isArray(err.message))
-  );
-}
-
-function isExpressError(err: unknown): err is ExpressError {
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    'statusCode' in err &&
-    typeof (err as Record<string, unknown>).statusCode === 'number'
-  );
-}
+import {
+  ExceptionResponse,
+  isExpressError,
+  isNestError,
+} from './all-exceptions.types';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

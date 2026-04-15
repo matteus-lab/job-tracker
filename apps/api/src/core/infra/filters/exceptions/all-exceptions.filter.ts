@@ -34,15 +34,10 @@ function mapHttpStatusToErrorCode(httpStatus: HttpStatus): ErrorCode {
 
 function mapErrorCodeToHttpStatus(errorCode: ErrorCode): HttpStatus {
   const map: Partial<Record<ErrorCode, HttpStatus>> = {
-    BAD_REQUEST: HttpStatus.BAD_REQUEST,
-    INTERNAL_SERVER_ERROR: HttpStatus.INTERNAL_SERVER_ERROR,
-    NOT_FOUND: HttpStatus.NOT_FOUND,
-    PAYLOAD_TOO_LARGE: HttpStatus.PAYLOAD_TOO_LARGE,
-    TOO_MANY_REQUESTS: HttpStatus.TOO_MANY_REQUESTS,
-    UNAUTHORIZED: HttpStatus.UNAUTHORIZED,
-
     // AUTH
     AUTH_INVALID_CREDENTIALS: HttpStatus.UNAUTHORIZED,
+    AUTH_SESSION_NOT_FOUND: HttpStatus.UNAUTHORIZED,
+    AUTH_USER_NOT_FOUND: HttpStatus.UNAUTHORIZED,
     AUTH_TOKEN_EXPIRED: HttpStatus.UNAUTHORIZED,
     AUTH_TOKEN_INVALID: HttpStatus.UNAUTHORIZED,
     AUTH_TOKEN_MISSING: HttpStatus.UNAUTHORIZED,

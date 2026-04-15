@@ -137,8 +137,8 @@ export class AuthController {
   ) {
     if (!refreshToken) {
       throw new BusinessError({
-        errorCode: ErrorCodes.UNAUTHORIZED,
-        messages: ['Unauthorized refresh action'],
+        errorCode: ErrorCodes.AUTH_TOKEN_MISSING,
+        messages: ['Refresh Token missing'],
       });
     }
 

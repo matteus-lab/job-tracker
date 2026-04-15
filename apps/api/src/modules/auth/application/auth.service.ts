@@ -124,7 +124,7 @@ export class AuthService {
 
     if (!session) {
       throw new BusinessError({
-        errorCode: ErrorCodes.NOT_FOUND,
+        errorCode: ErrorCodes.AUTH_SESSION_NOT_FOUND,
         messages: [
           'No session related to the given refresh token has been found',
         ],
@@ -135,8 +135,10 @@ export class AuthService {
 
     if (!userEntity) {
       throw new BusinessError({
-        errorCode: ErrorCodes.NOT_FOUND,
-        messages: ['No user related to the given refresh token has been found'],
+        errorCode: ErrorCodes.AUTH_USER_NOT_FOUND,
+        messages: [
+          'No user related to the session from the given refresh token has been found',
+        ],
       });
     }
 

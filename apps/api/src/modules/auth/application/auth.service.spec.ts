@@ -350,7 +350,7 @@ describe('AuthService', () => {
 
       try {
         await authService.refresh('wrong-token');
-        fail('service.refresh should trigger an error on wrong token');
+        fail('service.refresh should trigger an error on missing session');
       } catch (error) {
         expect(error).toBeInstanceOf(BusinessError);
 
@@ -358,9 +358,32 @@ describe('AuthService', () => {
 
         expect(businessError).toEqual(
           expect.objectContaining({
-            errorCode: ErrorCodes.NOT_FOUND,
+            errorCode: ErrorCodes.AUTH_SESSION_NOT_FOUND,
             messages: [
               'No session related to the given refresh token has been found',
+            ],
+          }),
+        );
+      }
+    });
+
+    it('should throw an error if given raw refresh token doesnt return any user', async () => {
+      sessionService.validateSession.mockResolvedValue(OLD_SESSION_ENTITY_STUB);
+      userService.getById.mockResolvedValue(null);
+
+      try {
+        await authService.refresh('wrong-token');
+        fail('service.refresh should trigger an error on missing user');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BusinessError);
+
+        const businessError = error as BusinessError;
+
+        expect(businessError).toEqual(
+          expect.objectContaining({
+            errorCode: ErrorCodes.AUTH_USER_NOT_FOUND,
+            messages: [
+              'No user related to the session from the given refresh token has been found',
             ],
           }),
         );

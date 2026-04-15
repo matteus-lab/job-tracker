@@ -36,7 +36,7 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) {
       throw new BusinessError({
         errorCode: ErrorCodes.AUTH_TOKEN_MISSING,
-        messages: ['Token missing'],
+        messages: ['Jwt Token missing'],
       });
     }
 

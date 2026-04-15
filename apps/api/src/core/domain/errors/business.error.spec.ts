@@ -8,15 +8,15 @@ describe('isBusinessError', () => {
   it('should return true for a valid business error', () => {
     const valids: BusinessErrorJson[] = [
       {
-        errorCode: ErrorCodes.UNAUTHORIZED,
+        errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
         messages: [],
       },
       {
-        errorCode: ErrorCodes.UNAUTHORIZED,
+        errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
         messages: ['msg 1'],
       },
       {
-        errorCode: ErrorCodes.UNAUTHORIZED,
+        errorCode: ErrorCodes.USER_EMAIL_ALREADY_EXISTS,
         messages: ['msg 1', 'msg 2'],
         targetFields: ['field 1', 'field 2'],
       },

@@ -154,7 +154,7 @@ describe('Auth module integration', () => {
       expect(result.expiresAt).toStrictEqual(sessionInDb?.expiresAt);
     });
 
-    it('should throw UNAUTHORIZED if user does not exist', async () => {
+    it('should throw an error if user does not exist', async () => {
       const loginDto: LoginRequestDto = {
         email: 'ghost@null.com',
         password: 'Password123!',
@@ -163,7 +163,7 @@ describe('Auth module integration', () => {
       await expect(authService.login(loginDto)).rejects.toThrow(BusinessError);
     });
 
-    it('should throw UNAUTHORIZED if password is incorrect', async () => {
+    it('should throw an error if password is incorrect', async () => {
       const email = 'ghost@null.com';
       const registerDto: RegisterRequestDto = {
         email,
@@ -214,7 +214,7 @@ describe('Auth module integration', () => {
       expect(newSession?.id).not.toBe(sessionBefore?.id);
     });
 
-    it('should throw an error if session is not found (invalid token)', async () => {
+    it('should throw an error on invalid token (no session found)', async () => {
       const invalidToken = '77777777-7777-7777-7777-777777777777';
 
       try {
@@ -225,7 +225,7 @@ describe('Auth module integration', () => {
         const businessError = error as BusinessError;
         expect(businessError).toEqual(
           expect.objectContaining({
-            errorCode: ErrorCodes.NOT_FOUND,
+            errorCode: ErrorCodes.AUTH_SESSION_NOT_FOUND,
             messages: [
               'No session related to the given refresh token has been found',
             ],

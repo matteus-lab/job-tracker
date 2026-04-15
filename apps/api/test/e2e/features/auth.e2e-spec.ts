@@ -338,15 +338,15 @@ describe('Auth Module e2e', () => {
       expect(refreshCookieToken).not.toBe(loginCookieToken);
     });
 
-    it('Should fail with UNAUTHORIZED AppBusinessException if refresh token is missing', async () => {
+    it('Should fail with UNAUTHORIZED BusinessError if refresh token is missing', async () => {
       const refreshResponse = await request(app.getHttpServer())
         .post(route)
         .expect(HttpStatus.UNAUTHORIZED);
 
       const body = refreshResponse.body as ErrorResponse;
       expect(body.statusCode).toBe(HttpStatus.UNAUTHORIZED);
-      expect(body.errorCode).toBe(ErrorCodes.UNAUTHORIZED);
-      expect(body.messages).toEqual(['Unauthorized refresh action']);
+      expect(body.errorCode).toBe(ErrorCodes.AUTH_TOKEN_MISSING);
+      expect(body.messages).toEqual(['Refresh Token missing']);
     });
   });
 

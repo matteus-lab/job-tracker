@@ -9,8 +9,8 @@ import {
   HASHING_PORT_TOKEN,
   HashingPort,
 } from 'src/modules/hashing/domain/hashing.port';
-import { UserService } from 'src/modules/user/engine/user.service';
-import { SessionService } from 'src/modules/session/engine/session.service';
+import { UserService } from 'src/modules/user/application/user.service';
+import { SessionService } from 'src/modules/session/application/session.service';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { SessionEntity } from 'src/modules/session/domain/entities/session.entity';
 import { PERSISTENCE_PORT_TOKEN } from 'src/modules/persistence/domain/persistence.port';

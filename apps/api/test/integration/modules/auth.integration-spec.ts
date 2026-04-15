@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
 import { PrismaAdapter } from 'src/modules/persistence/infra/prisma.adapter';
-import { AuthService } from 'src/modules/auth/engine/auth.service';
+import { AuthService } from 'src/modules/auth/application/auth.service';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';
 import { SessionModel, UserModel } from '@generated/models';
 import { JwtService } from '@nestjs/jwt';
-import { SessionService } from 'src/modules/session/engine/session.service';
+import { SessionService } from 'src/modules/session/application/session.service';
 import { ConfigService } from '@nestjs/config';
 import { JWT_REGEX, UUID_V4_REGEX } from 'test/constants/regex.constants';
 import { LoginRequestDto } from 'src/modules/auth/infra/dto/request/login.request.dto';
@@ -15,8 +15,8 @@ import {
 } from 'src/core/exceptions/business.exceptions';
 import { HttpStatus } from '@nestjs/common';
 import { JwtPayload } from 'src/core/types/jwt-payload.interface';
-import { RegisterCommand } from 'src/modules/auth/engine/commands/register.command';
-import { LoginCommand } from 'src/modules/auth/engine/commands/login.command';
+import { RegisterCommand } from 'src/modules/auth/application/commands/register.command';
+import { LoginCommand } from 'src/modules/auth/application/commands/login.command';
 
 describe('Auth module integration', () => {
   let moduleFixture: TestingModule;

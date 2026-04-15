@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 
 import { AuthController } from './auth.controller';
-import { AuthResult, AuthService } from '../engine/auth.service';
+import { AuthResult, AuthService } from '../application/auth.service';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';
 import { SessionEntity } from 'src/modules/session/domain/entities/session.entity';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';

@@ -1,7 +1,7 @@
 import ms from 'ms';
 import { AuthMapper } from 'src/modules/auth/infra/auth.mapper';
 
-import { AuthResult } from 'src/modules/auth/engine/auth.service';
+import { AuthResult } from 'src/modules/auth/application/auth.service';
 import { AuthResponseDto } from 'src/modules/auth/infra/dto/response/auth.response.dto';
 import { UserResponseDto } from 'src/modules/user/infra/dto/response/user.response.dto';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';

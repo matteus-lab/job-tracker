@@ -19,8 +19,8 @@ import {
 import { JwtPayload } from 'src/core/types/jwt-payload.interface';
 
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
-import { UserService } from 'src/modules/user/engine/user.service';
-import { SessionService } from 'src/modules/session/engine/session.service';
+import { UserService } from 'src/modules/user/application/user.service';
+import { SessionService } from 'src/modules/session/application/session.service';
 import { RegisterCommand } from './commands/register.command';
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { LoginCommand } from './commands/login.command';

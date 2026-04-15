@@ -24,7 +24,7 @@ import {
 } from 'src/core/exceptions/business.exceptions';
 import { Public } from 'src/core/decorators/public.decorator';
 import { Cookies } from 'src/core/decorators/cookies.decorator';
-import { AuthService } from '../engine/auth.service';
+import { AuthService } from '../application/auth.service';
 import { AuthMapper } from './auth.mapper';
 import { AuthResponseDto } from 'src/modules/auth/infra/dto/response/auth.response.dto';
 import { RegisterRequestDto } from 'src/modules/auth/infra/dto/request/register.request.dto';

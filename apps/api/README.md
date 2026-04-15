@@ -48,7 +48,7 @@ $ npm run api:build       # Build the app
 To achieve total decoupling, we use the **Ports & Adapters** pattern:
 
 1. **The Port (Interface)**: Defined in the Domain layer (`modules/foo/domain/bar.repository.interface.ts`). It defines the _contract_ (e.g., "I need a way to save a user").
-2. **The Service**: Defined in the Engine layer (`modules/foo/engine/bar.service.ts`). The Service only knows the Interface. This inversion of dependency makes the system independent from any specific implementation. NestJS links them via **Injection Tokens**.
+2. **The Service**: Defined in the Application layer (`modules/foo/application/bar.service.ts`). The Service only knows the Interface. This inversion of dependency makes the system independent from any specific implementation. NestJS links them via **Injection Tokens**.
 3. **The Adapter (Implementation)**: Defined in the Infrastructure layer (`modules/foo/infra/bar.repository.ts`). It fulfills the contract using a specific technology (Prisma) and is injected by NestJS (ID).
 
 ### The `/modules/foo` Hub
@@ -59,8 +59,8 @@ To achieve total decoupling, we use the **Ports & Adapters** pattern:
 | **`domain/foo.bar.interface.ts`**   | `I*`           | Interfaces (Port) for a repository                                      |
 | **`domain/entities/bar.entity.ts`** | `*Entity`      | The "Noble" business object. DB-agnostic & Stable.                      |
 | **`engine`**                        |                | Defines what the application does using the domain.                     |
-| **`engine/commands/`**              | `*Command`     | Defines what the engines will receives has inputs.                      |
-| **`engine/foo.service`**            | `*Service`     | An engine for use-cases                                                 |
+| **`application/commands/`**         | `*Command`     | Defines what the engines will receives has inputs.                      |
+| **`application/foo.service`**       | `*Service`     | An engine for use-cases                                                 |
 | **`infra`**                         |                | External dependencies                                                   |
 | **`infra/dto/request/`**            | `*RequestDto`  | Incoming API data. Validated via `class-validator`.                     |
 | **`infra/dto/response/`**           | `*ResponseDto` | Outgoing API data. Controlled via `class-transformer`.                  |

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { USER_REPOSITORY_PORT_TOKEN } from './domain/user.repository.port';
-import { UserService } from './engine/user.service';
+import { UserService } from './application/user.service';
 import { UserRepository } from './infra/user.repository';
 import { HashingModule } from '../hashing/hashing.module';
 import { PersistenceModule } from '../persistence/persistence.module';

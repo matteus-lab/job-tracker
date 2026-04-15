@@ -12,8 +12,8 @@ import {
 import { UserEntity } from 'src/modules/user/domain/entities/user.entity';
 import { UserWithPasswordEntity } from 'src/modules/user/domain/entities/userWithPassword.entity';
 import { USER_REPOSITORY_PORT_TOKEN } from 'src/modules/user/domain/user.repository.port';
-import { CreateUserCommand } from 'src/modules/user/engine/commands/createUser.command';
-import { UserService } from 'src/modules/user/engine/user.service';
+import { CreateUserCommand } from 'src/modules/user/application/commands/createUser.command';
+import { UserService } from 'src/modules/user/application/user.service';
 import { UserRepository } from 'src/modules/user/infra/user.repository';
 import { CreateUserPersistence } from 'src/modules/user/domain/persistence/createUser.persistence';
 

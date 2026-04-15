@@ -8,8 +8,8 @@ import { SessionModel } from '@generated/models';
 
 import { SessionEntity } from 'src/modules/session/domain/entities/session.entity';
 import { SESSION_REPOSITORY_PORT_TOKEN } from 'src/modules/session/domain/session.repository.port';
-import { CreateSessionCommand } from 'src/modules/session/engine/commands/createSession.command';
-import { SessionService } from 'src/modules/session/engine/session.service';
+import { CreateSessionCommand } from 'src/modules/session/application/commands/createSession.command';
+import { SessionService } from 'src/modules/session/application/session.service';
 import { CreateSessionPersistence } from 'src/modules/session/domain/persistence/createSession.persistence';
 import { SessionRepository } from 'src/modules/session/infra/session.repository';
 import { CreateUserPersistence } from 'src/modules/user/domain/persistence/createUser.persistence';
